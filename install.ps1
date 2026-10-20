@@ -93,10 +93,21 @@ else {
 }
 
 # WorkBuddy 是否在运行（token 要从它的进程内存里取）
-$wbProcs = @(Get-Process -ErrorAction SilentlyContinue | Where-Object { $_.ProcessName -match 'WorkBuddy|codebuddy' })
-$wbRunning = $wbProcs.Count -gt 0
-if ($wbRunning) { & $ok "WorkBuddy 正在运行" }
-else { & $warn "WorkBuddy 似乎没在运行 —— 请先打开它并随便发一句话，否则取不到凭据" }
+# 不同版本的 WorkBuddy 承载 CLI 的进程名不一样（WorkBuddy.exe / node.exe / CodeBuddy.exe）
+$wbProcCands = @()
+try {
+  $wbProcCands = Get-CimInstance Win32_Process -ErrorAction Stop | Where-Object {
+    ($_.Name -match '^(WorkBuddy|CodeBuddy|codebuddy)') -or
+    ($_.Name -match '^node' -and $_.CommandLine -and $_.CommandLine -match 'codebuddy|workbuddy')
+  }
+} catch { }
+if ($wbProcCands.Count -gt 0) {
+  $serving = @($wbProcCands | Where-Object { $_.CommandLine -and $_.CommandLine -match '--serve' })
+  & $ok ("WorkBuddy 正在运行（{0} 个相关进程{1}）" -f $wbProcCands.Count, $(if ($serving.Count) { "，其中 $($serving.Count) 个 serve" } else { "" }))
+} else {
+  & $warn "没检测到 WorkBuddy 进程 —— 请打开 WorkBuddy、登录、随便发一句话，再重跑本脚本"
+  & $warn "（若确认 WorkBuddy 已打开，跑 scripts\wb-doctor.ps1 把输出发给作者）"
+}
 
 # ---------------------------------------------------------------- 2. 生成配置
 & $step "[2/5] 写入配置"

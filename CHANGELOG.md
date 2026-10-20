@@ -51,6 +51,37 @@
 - 文档：`REPORT.md`（架构/实测证据/换机预估）、`docs/ARCHITECTURE.md`（协议细节）、
   `docs/RUNBOOK.md`（运维手册）、`deploy/NEW-MACHINE.md`（换机部署清单）
 
+### 修复：取 token 时只认 `WorkBuddy.exe`（换机必失败）
+
+**现象**：换到另一台电脑，WorkBuddy 明明开着、也发过消息，启动脚本却报
+「需要 WorkBuddy 在运行（用来取 token）」。
+
+**根因**：检测写死了 `Get-CimInstance Win32_Process -Filter "Name='WorkBuddy.exe'"`
+并要求命令行同时含 `codebuddy` 和 `--serve`。实测发现不同构建里承载 CLI 的进程名不同：
+
+| 进程 | 实测命令行 |
+|---|---|
+| `node.exe` pid 12800 | `node "...\cli\bin\codebuddy" --serve --port 8790 ...` ← **真正的 serve** |
+| `WorkBuddy.exe` pid 25848 | `WorkBuddy.exe ...sidecar-entry.js --token ... --control-pipe-uuid ...`（不含 codebuddy/--serve） |
+
+所以按 `WorkBuddy.exe` 过滤永远找不到 serve。作者本机因为一直有 token 缓存，
+没有触发过这条路径，问题被掩盖了。
+
+**修法**（不再猜进程名）：
+
+- 候选范围放宽为 `WorkBuddy*` / `CodeBuddy*` / 命令行含 `codebuddy|workbuddy` 的 `node*`
+- 命令行含 `--serve` 的优先，其余作为兜底
+- **逐个进程扫内存，谁里面有 JWT 就用谁**；全失败时打印每个进程的扫描结果
+- 非管理员时额外提示「若 WorkBuddy 以管理员运行，读不到它的内存」
+- `install.ps1` 的运行检测同步放宽
+
+**新增 `scripts/wb-doctor.ps1`**（只读取证）：系统/管理员状态、WorkBuddy 安装路径与版本、
+全部候选进程及命令行、`OpenProcess` 可读性实测、逐进程 JWT 扫描结果、缓存与配置状态、
+端口与计划任务、结论。报告存 `%TEMP%\wb-doctor-<时间>.txt`，不含 token，可直接发给作者。
+
+顺带修掉两个 PowerShell 陷阱：函数名 `H` 撞上内置别名 `Get-History`；
+`@($a + 'b', $c)` 因逗号优先级被拼成一个字符串。
+
 ### 修复：分发可用性（别人 clone 下来根本用不了）
 
 发布后发现文档默认"桌面上已经有快捷方式"、`desktop/*.cmd` 里写死了作者本机路径、

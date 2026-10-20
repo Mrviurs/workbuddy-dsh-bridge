@@ -200,6 +200,7 @@ It identifies more than half of all problems, and **it does not contain your pas
 | Double-click does nothing | Still launching | Wait 5 s; if still nothing, reboot |
 | All three dots red | Services aren't up | Click "Start / Repair", wait for it to finish |
 | Third dot red: "no credential" | WorkBuddy closed or not signed in | Open WorkBuddy, send a message, then click "Start / Repair" |
+| Log says "needs WorkBuddy running" but it is running | Different WorkBuddy builds use different process names; the old check missed them | Fixed (it now scans every candidate process). If it still fails, run `scripts\wb-doctor.ps1` and send the report |
 | Third dot yellow: "2 days left" | Credential expiring soon | Not urgent, but send a message + click Start soon |
 | DSH says `Connection error` | Bridge isn't running | Open the app → check dots → click Start |
 | DSH says `MISSING_CREDENTIAL` | DSH side isn't configured | Send me diagnostics — this is a config issue |

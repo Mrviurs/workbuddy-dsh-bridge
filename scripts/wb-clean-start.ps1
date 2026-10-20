@@ -65,18 +65,65 @@ if (-not $RescanToken -and (Test-Path $jwtPath)) {
   else { Ok "缓存 token 可用（有效期至 $exp）" }
 }
 if (-not $jwt) {
-  $serve = Get-CimInstance Win32_Process -Filter "Name='WorkBuddy.exe'" |
-           Where-Object { $_.CommandLine -match 'codebuddy' -and $_.CommandLine -match '--serve' } |
-           Sort-Object CreationDate -Descending | Select-Object -First 1
-  if (-not $serve) { Bad "需要 WorkBuddy 在运行（用来取 token）：先在 WorkBuddy 里发一句话"; exit 1 }
-  Warn "从 WorkBuddy serve(pid $($serve.ProcessId)) 内存扫描 token…"
-  & $scanPs1 -ProcessId $serve.ProcessId -MaxMB 2048 6>$null | Out-Null
-  if (-not (Test-Path 'C:\temp\wb-mem-candidates.txt')) { Bad "内存扫描无结果"; exit 1 }
-  $cands = Get-Content 'C:\temp\wb-mem-candidates.txt' -Encoding UTF8
-  $jwt = (($cands | Where-Object { $_ -match '^bearer\teyJ' } | Sort-Object Length -Descending | Select-Object -First 1) -replace '^[^\t]+\t','')
-  if (-not $jwt) { Bad "没扫到 JWT"; exit 1 }
+  # 候选进程：不同版本的 WorkBuddy 承载 CLI 的进程名不一样——
+  # 可能是 WorkBuddy.exe / CodeBuddy.exe / 也可能是 node.exe 跑 codebuddy。
+  # 所以不猜名字，把可疑的都列出来，逐个扫内存，谁有 JWT 就用谁。
+  $procCands = @()
+  try {
+    $procCands = Get-CimInstance Win32_Process -ErrorAction Stop | Where-Object {
+      ($_.Name -match '^(WorkBuddy|CodeBuddy|codebuddy)') -or
+      ($_.Name -match '^node' -and $_.CommandLine -and $_.CommandLine -match 'codebuddy|workbuddy')
+    }
+  } catch {
+    Warn "枚举进程失败：$($_.Exception.Message)"
+  }
+
+  # 优先扫命令行带 --serve 的（那才是真正持有 token 的进程），其余作为兜底
+  $serving = @($procCands | Where-Object { $_.CommandLine -and $_.CommandLine -match '--serve' })
+  $ordered = @($serving) + @($procCands | Where-Object { $serving.ProcessId -notcontains $_.ProcessId })
+
+  if ($ordered.Count -eq 0) {
+    Bad "没找到任何 WorkBuddy / CodeBuddy 相关进程"
+    Write-Host "        1) 确认 WorkBuddy 已打开、已登录、并且随便发过一句话" -ForegroundColor Yellow
+    Write-Host "        2) 还是不行就跑：scripts\wb-doctor.ps1  把输出发给作者" -ForegroundColor Yellow
+    exit 1
+  }
+
+  $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+  Warn "共找到 $($ordered.Count) 个候选进程，逐个尝试取 token…"
+
+  $scanLog = @()
+  foreach ($proc in $ordered) {
+    $tag = "$($proc.Name) (pid $($proc.ProcessId))"
+    Write-Host "        -> 扫描 $tag" -ForegroundColor DarkGray
+    Remove-Item 'C:\temp\wb-mem-candidates.txt' -Force -ErrorAction SilentlyContinue
+    & $scanPs1 -ProcessId $proc.ProcessId -MaxMB 2048 6>$null | Out-Null
+    if (Test-Path 'C:\temp\wb-mem-candidates.txt') {
+      $mem = Get-Content 'C:\temp\wb-mem-candidates.txt' -Encoding UTF8
+      $hit = (($mem | Where-Object { $_ -match '^bearer\teyJ' } | Sort-Object Length -Descending | Select-Object -First 1) -replace '^[^\t]+\t','')
+      if ($hit) {
+        $jwt = $hit
+        Ok "在 $tag 里扫到 token（len=$($jwt.Length)）"
+        break
+      }
+      $scanLog += "$tag : 扫完但没发现 JWT"
+    } else {
+      $scanLog += "$tag : 扫描失败（多半是权限不足）"
+    }
+  }
+
+  if (-not $jwt) {
+    Bad "候选进程里都没扫到 JWT"
+    foreach ($line in $scanLog) { Write-Host "        $line" -ForegroundColor DarkGray }
+    if (-not $isAdmin) {
+      Write-Host "        当前不是管理员。若 WorkBuddy 是「以管理员身份运行」的，读不到它的内存 —— 请右键以管理员身份重跑本脚本。" -ForegroundColor Yellow
+    }
+    Write-Host "        跑 scripts\wb-doctor.ps1 做完整诊断，把输出发给作者。" -ForegroundColor Yellow
+    exit 1
+  }
+
   [System.IO.File]::WriteAllText($jwtPath, $jwt, (New-Object System.Text.UTF8Encoding($false)))
-  Ok "已扫到 token（len=$($jwt.Length)，有效期至 $(Get-JwtExp $jwt)），缓存到 $jwtPath"
+  Ok "token 已缓存到 $jwtPath（有效期至 $(Get-JwtExp $jwt)）"
 }
 
 # ---------- 2. system prompt 文件 ----------

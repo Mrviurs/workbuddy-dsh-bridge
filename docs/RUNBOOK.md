@@ -29,6 +29,38 @@ token 过期（有效期约 30 天）。处置：
    - 扫到 `bearer len≈1300 eyJ...` → token 正常，问题在别处
    - 只扫到 43 字符的短串 → 那不是 auth token，说明 serve 进程换了或没登录
 
+
+## 启动脚本说「需要 WorkBuddy 在运行」，但我明明开着
+
+**原因**：不同版本的 WorkBuddy 承载内置 CLI 的进程名不一样 ——
+可能是 `WorkBuddy.exe`、`node.exe`（用 node 跑 `codebuddy`）、也可能是 `CodeBuddy.exe`。
+早期版本只认 `WorkBuddy.exe`，在别的机器上会漏判。
+
+**现在的做法**：不猜进程名。把所有可疑进程（`WorkBuddy*` / `CodeBuddy*` / 命令行含
+`codebuddy` 或 `workbuddy` 的 node）都列出来，**逐个扫内存，谁里面有 JWT 就用谁**。
+顺带会把「非管理员读不到内存」这种情况单独提示出来。
+
+**自己确认的办法**：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\wb-doctor.ps1
+```
+
+报告会列出：
+
+| 节 | 内容 |
+|---|---|
+| 1 | 系统 / 是否管理员（读进程内存需要） |
+| 2 | WorkBuddy 安装路径与版本 |
+| 3 | **所有相关进程**（名字 / pid / 内存 / 命令行 / 是否含 `--serve`） |
+| 4 | 每个进程能否读取（`OpenProcess` 实测） |
+| 5 | **每个进程里有没有 JWT**（逐进程扫内存） |
+| 6 | 缓存 token 与 `settings.psd1` 状态 |
+| 7 | 端口 8791 / 8787 与两个计划任务 |
+| 8 | 结论与下一步建议 |
+
+报告不含 token 本身，可以直接发给作者。
+
 ## 关键路径速查
 
 | 用途 | 路径 |
