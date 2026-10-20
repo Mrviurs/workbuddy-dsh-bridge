@@ -2,6 +2,20 @@
 
 格式遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [Unreleased]
+
+### 变更
+
+- **许可证从 MIT 改为 [Noncommercial Source-Available License v1.0](LICENSE)**：
+  源码可见、可读、可改、个人免费使用，**禁止商业使用**。
+  注意：改后本项目**不再属于 OSI 定义的"开源软件"**（OSI 要求允许商业使用），
+  准确说法是 source-available。
+- 新增 [DISCLAIMER.md](DISCLAIMER.md)（中文）与 [DISCLAIMER.en.md](DISCLAIMER.en.md)（English）：
+  逐条列明软件的真实行为（读进程内存 / 本地存 token / 注册计划任务 / 转发对话）、
+  账号与技术风险、明确禁止用途、担保与责任限制、合规责任归属。
+- README 顶部免责段扩写为六节摘要，并加 `OSI open source: no` 徽章，避免误导。
+- 新增 [傻瓜手册（中文）](docs/GUIDE.zh-CN.md) 与 [Idiot-Proof Guide](docs/GUIDE.md)。
+
 ## [1.0.0] — 2026-10-20
 
 首个可用版本：WorkBuddy 账号里的模型接入 DeepSeek Harness，工具调用双向互通。

@@ -1,21 +1,130 @@
-MIT License
+NONCOMMERCIAL SOURCE-AVAILABLE LICENSE
+Version 1.0
 
 Copyright (c) 2026 lynx
+Project: workbuddy-dsh-bridge
+<https://github.com/Mrviurs/workbuddy-dsh-bridge>
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+────────────────────────────────────────────────────────────────────────────
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+PLEASE READ THIS FIRST
+
+This is NOT an OSI-approved open source license. The source is available for
+reading, personal use, and modification, but COMMERCIAL USE IS PROHIBITED.
+
+If you need a mature, lawyer-reviewed noncommercial license instead of this
+one, the closest match is PolyForm Noncommercial 1.0.0:
+<https://polyformproject.org/licenses/noncommercial/1.0.0/>
+
+────────────────────────────────────────────────────────────────────────────
+
+1. DEFINITIONS
+
+"Software" means the source code, scripts, documentation, configuration
+templates, and any accompanying files in this project.
+
+"You" means the individual exercising rights under this license.
+
+"Commercial Use" means any use that is intended for or directed toward
+commercial advantage or monetary compensation, including but not limited to:
+use in the operations of a business; use to deliver paid products or services;
+use in the development of a product offered for sale; use by a for-profit
+entity for its internal workflows; or use to generate advertising, affiliate,
+or subscription revenue.
+
+2. GRANT OF RIGHTS
+
+Subject to your full compliance with this license, you are granted a
+worldwide, royalty-free, non-exclusive, non-transferable right to:
+
+  (a) run the Software on devices you own or control, for personal,
+      non-commercial purposes;
+
+  (b) read, study, and modify the source code for those purposes;
+
+  (c) share unmodified copies of the Software with other individuals, provided
+      they receive this license in full and agree to it.
+
+3. PROHIBITED USES
+
+You may NOT:
+
+  (a) use the Software for any Commercial Use;
+
+  (b) sell, rent, lease, sublicense, publish for payment, or otherwise charge
+      any fee for the Software itself or for access to it;
+
+  (c) operate the Software, or any derivative of it, as a hosted, managed, or
+      "as a service" offering for third parties;
+
+  (d) bundle or redistribute the Software as part of a commercial product,
+      commercial distribution channel, paid course, or paid bundle;
+
+  (e) use the Software to extract, collect, bundle, resell, pool, proxy, or
+      redistribute any other person's account credentials, access tokens, or
+      model quota;
+
+  (f) use the Software to circumvent, avoid, or reduce fees owed to any
+      third-party product or service;
+
+  (g) remove, obscure, or alter this license, the copyright notice, or any
+      attribution notice in the Software;
+
+  (h) use the Software for any unlawful purpose, or in violation of the terms
+      of service of any third-party product it interacts with.
+
+4. CONDITIONS
+
+  (a) Any copy of the Software, in whole or in part, must include this license
+      verbatim.
+
+  (b) Modified versions must be clearly identified as modified, and must not
+      suggest that the original author endorses or supports them.
+
+  (c) You are solely responsible for determining whether your use complies with
+      the terms of service, laws, and regulations that apply to you.
+
+5. NO WARRANTY
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT. THE AUTHOR DOES
+NOT WARRANT THAT THE SOFTWARE WILL FUNCTION UNINTERRUPTED, ERROR-FREE, OR AT
+ALL — IN PARTICULAR, IT DEPENDS ON UNDOCUMENTED INTERFACES OF THIRD-PARTY
+SOFTWARE THAT MAY CHANGE OR DISAPPEAR AT ANY TIME.
+
+6. LIMITATION OF LIABILITY
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL THE
+AUTHOR BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR
+PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS, DATA, CREDENTIALS, ACCOUNT STANDING,
+OR SERVICE QUOTA, HOWEVER CAUSED AND UNDER ANY THEORY OF LIABILITY, ARISING OUT
+OF OR RELATED TO YOUR USE OF OR INABILITY TO USE THE SOFTWARE, EVEN IF ADVISED
+OF THE POSSIBILITY OF SUCH DAMAGE.
+
+7. INDEMNITY
+
+You agree to indemnify, defend, and hold harmless the author from and against
+any claims, damages, liabilities, costs, and expenses (including reasonable
+legal fees) arising out of or related to: (i) your use of the Software; (ii) any
+claim by a third-party service provider or account holder relating to your use;
+or (iii) your breach of this license.
+
+8. TERMINATION
+
+Your rights under this license terminate automatically and immediately if you
+breach any of its terms. On termination you must stop using the Software and
+destroy all copies in your possession.
+
+9. SEPARATE COMMERCIAL TERMS
+
+Commercial use may be licensed separately, at the author's sole discretion, by
+written agreement. Absence of a reply is not permission.
+
+10. MISCELLANEOUS
+
+  (a) This license is the entire agreement concerning the Software.
+  (b) If any provision is held unenforceable, the remaining provisions stay in
+      force.
+  (c) This text is not legal advice. If you need certainty, consult a lawyer in
+      your jurisdiction.

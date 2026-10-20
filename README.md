@@ -1,6 +1,7 @@
 # workbuddy-dsh-bridge
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: Noncommercial](https://img.shields.io/badge/license-Noncommercial-orange.svg)](LICENSE)
+[![OSI Open Source](https://img.shields.io/badge/OSI%20open%20source-no-red.svg)](#license)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-0078D4)](#)
 [![PowerShell](https://img.shields.io/badge/PowerShell-5.1%2B-5391FE)](#)
 [![Python](https://img.shields.io/badge/Python-3.8%2B-3776AB)](#)
@@ -18,13 +19,43 @@
 
 ---
 
-## 免责声明（先读）
+## 免责声明（必读）
 
-- 本项目**不是** WorkBuddy / CodeBuddy / DeepSeek 的官方集成，与上述产品无隶属关系。
-- 它复用**你自己账号**的额度，适用于你自己的机器。请自行确认符合服务方条款；不要拿它做二次分发或商业转售。
-- token 通过读取**你自己启动的进程内存**获得，只存本机。详见 [SECURITY.md](SECURITY.md)。
-- 它依赖 WorkBuddy 客户端内部接口（`/api/v1/runs`、ACP、CLI 参数）。**对方升级可能让它失效**，这是预期风险。
-- 仅供个人在本机自用：serve 绑 `127.0.0.1` 且 `--auth none`，**不要暴露到公网**。
+> 完整版：[DISCLAIMER.md](DISCLAIMER.md)（中文） · [DISCLAIMER.en.md](DISCLAIMER.en.md) (English)
+> 下载、运行或修改本项目，即视为接受全部条款。本文档不构成法律意见。
+
+**一、与官方无关**
+本项目是独立的个人技术项目，**不是** 腾讯 / WorkBuddy / CodeBuddy 的官方产品或合作项目，
+**不是** 深度求索 / DeepSeek / DSH 的官方集成，**未获**任何授权、认可或支持。
+所有商标归其各自所有者。
+
+**二、它到底做了什么**
+① 读取你**自己启动的** WorkBuddy 进程内存，取出该账号的 access token；
+② 写入本地 `C:\temp\wb-jwt.txt`（明文）；③ 用该凭据启动 WorkBuddy 自带的
+`codebuddy --serve`（仅监听 `127.0.0.1`）；④ 把你的对话转发到 `www.workbuddy.cn`
+——**与你直接使用 WorkBuddy 时数据流向相同**；⑤ 注册两个开机自启任务。
+**不收集、不上报、不回传任何数据**，可断网审计源码验证。
+
+**三、你接受的风险**
+- 账号可能被限流 / 降级 / 暂停 / 封禁，额度可能异常消耗——**作者无法干预、不承担责任**；
+- 依赖上游**未公开内部接口**，对方任意一次更新都可能让它失效，**作者没有修复义务**；
+- `wb-jwt.txt` 里的 token **约等于账号密码**，泄露后果自负；
+- 本软件会修改 DSH 配置并注册计划任务，配置混乱 / 数据丢失风险自负。
+
+**四、明确禁止**
+🚫 **商业使用**（含企业内部流程、付费服务、商业产品集成）　🚫 转售 / 出租 / 代充 / 售卖访问权
+🚫 做成"中转站"对外提供 API　🚫 批量注册 / 多账号池 / 代他人提取凭据
+🚫 帮助他人绕过官方付费或授权　🚫 移除版权与许可声明后再分发　🚫 任何违法或违反上游条款的用途
+
+需要上述任何一项的场景，**这个项目不适合你**。
+
+**五、担保与责任**
+按"AS IS"提供，无任何担保；作者不承担间接 / 附带 / 后果性损害（含利润、数据、凭据、账号、额度损失）；
+**你就因自己使用而产生的第三方索赔对作者进行赔偿并使其免责**。
+
+**六、合规是你的责任**
+需自行确认并遵守 WorkBuddy / DeepSeek 的服务条款、你所在地的法律法规、以及你所在单位的安全制度。
+**作者不替你判断边界**——按下"启动"的那一刻，这个判断就由你做出了。
 
 ---
 
@@ -99,6 +130,7 @@ Set-ExecutionPolicy -Scope Process Bypass -Force
 | [协议细节](docs/ARCHITECTURE.md) | 想改代码 / 上游升级后要修 |
 | [换机部署清单](deploy/NEW-MACHINE.md) | 要在另一台电脑上跑 |
 | [实测报告](REPORT.md) | 架构、证据、能力边界 |
+| **[免责声明](DISCLAIMER.md) / [Disclaimer](DISCLAIMER.en.md)** | 使用前必读：风险、禁止用途、责任划分 |
 
 ## 目录结构
 
@@ -176,7 +208,15 @@ python -m PyInstaller --noconfirm --onedir --noconsole --name WorkBuddyRelayUI `
 
 ## License
 
-[MIT](LICENSE) —— 使用前请先读 [SECURITY.md](SECURITY.md) 与上面的免责声明。
+**[Noncommercial Source-Available License v1.0](LICENSE)** —— 源码可见、可读、可改、个人免费使用，
+**禁止商业使用**。
+
+> 严格来说本项目**不属于 OSI 定义的"开源软件"**（OSI 要求允许商业使用），
+> 准确说法是 **source-available（源码可用）**。
+> 需要更成熟的法律文本可考虑 [PolyForm Noncommercial 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0/)；
+> 想真正开源（允许商用）则改用 MIT / Apache-2.0 —— 但那与"禁止商用"矛盾，取舍在你。
+
+使用前请先读 [DISCLAIMER.md](DISCLAIMER.md) 与 [SECURITY.md](SECURITY.md)。
 
 ---
 
