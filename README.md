@@ -215,7 +215,13 @@ python -m PyInstaller --noconfirm --onedir --noconsole --name WorkBuddyRelayUI `
 | 个人 / 非商业使用（读、改、跑） | **免费，不需要申请** |
 | 商业使用（企业内部流程、付费服务、商业产品集成） | **需事先取得书面授权** |
 
-**怎么申请商用授权**：开一个 issue，标题写 `[Commercial License]`，内容说明：你是谁 / 打算做什么 / 大概什么规模。看到会回。
+**怎么申请商用授权**
+
+1. 开一个 issue，标题写 `[Commercial License]`
+2. 内容说明：你是谁 / 打算做什么 / 大概什么规模
+3. 我填好条款发你确认 —— 模板已备好：[COMMERCIAL-TERMS.md](COMMERCIAL-TERMS.md)（中文） · [English](COMMERCIAL-TERMS.en.md)
+
+条款模板含：授权范围勾选、期限、费用栏位、署名要求、**责任上限**、以及六条"付钱也不授权"的红线。
 （沉默不等于同意 —— 没收到明确答复之前，商业使用仍未授权。）
 
 > 因为商用不是自动授予，所以本项目**不属于 OSI 定义的"开源软件"**，

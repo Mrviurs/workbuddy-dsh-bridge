@@ -16,6 +16,9 @@
   账号与技术风险、明确禁止用途、担保与责任限制、合规责任归属。
 - README 顶部免责段扩写为六节摘要，并加 `OSI open source: no` 徽章，避免误导。
 - 新增 [傻瓜手册（中文）](docs/GUIDE.zh-CN.md) 与 [Idiot-Proof Guide](docs/GUIDE.md)。
+- 新增商用授权条款模板 [COMMERCIAL-TERMS.md](COMMERCIAL-TERMS.md)（中文）/
+  [COMMERCIAL-TERMS.en.md](COMMERCIAL-TERMS.en.md)（English）：范围勾选、期限、费用、署名、
+  责任上限、六条不可授权的红线，附「收到商用询问时的回复模板」与签署前自查清单。
 
 ## [1.0.0] — 2026-10-20
 
