@@ -89,6 +89,17 @@ Set-ExecutionPolicy -Scope Process Bypass -Force
 
 ---
 
+## 使用文档
+
+| 文档 | 给谁看 |
+|---|---|
+| **[傻瓜手册（中文）](docs/GUIDE.zh-CN.md)** | 不想碰命令行的人。照着点，5 分钟上手 |
+| **[Idiot-Proof Guide (English)](docs/GUIDE.md)** | Same thing, in English |
+| [运维手册](docs/RUNBOOK.md) | 日常排障、调参、换机 |
+| [协议细节](docs/ARCHITECTURE.md) | 想改代码 / 上游升级后要修 |
+| [换机部署清单](deploy/NEW-MACHINE.md) | 要在另一台电脑上跑 |
+| [实测报告](REPORT.md) | 架构、证据、能力边界 |
+
 ## 目录结构
 
 ```
