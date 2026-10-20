@@ -1,4 +1,4 @@
-﻿# wb-relay-start.ps1  —— 由桌面「启动WorkBuddy中转.cmd」调用
+﻿# wb-relay-start.ps1  —— 由 desktop\启动WorkBuddy中转-旧模式.cmd 或桌面快捷方式调用
 # 作用：把本机 WorkBuddy 的 codebuddy 服务重新桥接成 OpenAI 兼容接口（127.0.0.1:8787）
 #
 # 关键设计：relay 由 Windows 计划任务（WorkBuddyRelay）托管，
@@ -55,7 +55,7 @@ $serves = Get-CimInstance Win32_Process -Filter "Name='WorkBuddy.exe'" |
 if (-not $serves) {
   Bad "没找到 codebuddy --serve 进程"
   Write-Host ""
-  Write-Host "  处理办法：打开 WorkBuddy，随便发一句话（或新建一个对话），让它把 serve 拉起来，再重新双击本脚本。" -ForegroundColor Yellow
+  Write-Host "  处理办法：打开 WorkBuddy，随便发一句话（或新建一个对话），让它把 serve 拉起来，再重跑 scripts\wb-clean-start.ps1。" -ForegroundColor Yellow
   exit 1
 }
 $proc = $serves | Select-Object -First 1

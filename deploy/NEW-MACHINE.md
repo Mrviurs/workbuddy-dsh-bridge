@@ -1,7 +1,7 @@
 # 换到另一台电脑：部署清单
 
-> 结论先说：**不是"拷过去双击 exe 点启动就行"**。
-> 双击 exe 只是入口；能不能跑取决于下面 6 个前置条件，其中 3 个必须人工确认。
+> 结论先说：**拷过去之后要跑一次 `一键安装.cmd`，不是直接双击 exe 就行**。
+> 仓库里不含 exe 与桌面快捷方式（都在安装时现生成），而且能不能跑取决于下面 6 个前置条件，其中 3 个必须人工确认。
 
 ## 一、判定表：什么情况下能跑
 
@@ -54,9 +54,11 @@ Get-ChildItem 'C:\','D:\' -Recurse -Filter codebuddy -ErrorAction SilentlyContin
 
 > 不要把旧机器的 `C:\temp\wb-jwt.txt` 拷过来 —— token 绑账号会话，新机器重扫更干净。
 
-### 第 3 步：双击 exe → 点「启动 / 修复」
+### 第 3 步：跑一次安装 → 双击桌面图标 → 点「启动 / 修复」
 
-`ui\dist\WorkBuddyRelayUI\WorkBuddyRelayUI.exe`（或桌面快捷方式）。
+**先在项目根双击 `一键安装.cmd`**（探测 CLI 路径 → 写配置 → 打包 exe → 建桌面快捷方式），之后双击桌面「WorkBuddy中转工具」即可。
+
+> 仓库里**不含** exe 与桌面快捷方式（`.gitignore` 排除了 `ui/dist/`），`ui\dist\WorkBuddyRelayUI\WorkBuddyRelayUI.exe` 是安装时现生成的。
 
 看到三盏灯变绿 + 日志里出现 `自测通过 / 工具自测：finish=tool_calls` 就算成功。
 失败的话点日志区右上「**复制诊断报告**」，把内容贴出来即可定位。
@@ -80,7 +82,7 @@ Get-ChildItem 'C:\','D:\' -Recurse -Filter codebuddy -ErrorAction SilentlyContin
 | 日志 `找不到 pythonw.exe` | 没装 Python | 装 Python 3.x（勾选 Add to PATH） |
 | 日志 `需要 WorkBuddy 在运行` | WorkBuddy 没开 / 没登录 | 打开并发一句话 |
 | `上游未登录 / 401` | token 过期（约 30 天） | 打开 WorkBuddy 发一句话 → 重新点启动（自动重扫） |
-| DSH 报 `Connection error` | relay 没跑 | 双击 exe 点启动；或看 `C:\temp\wb-relay.log` |
+| DSH 报 `Connection error` | relay 没跑 | 双击桌面「WorkBuddy中转工具」点启动；或看 `C:\temp\wb-relay.log` |
 | DSH 报 `MISSING_CREDENTIAL` | 缺 `WORKBUDDY_LOCAL_KEY` | 见第三节第 2 步 |
 | 端口被占 | 8787/8791 冲突 | 改 `settings.psd1` 两个端口 + DSH 的 `baseURL` |
 

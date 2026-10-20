@@ -1,7 +1,7 @@
 ﻿
 # 运行时目录（本机固定 C:\temp；不存在时自动创建，避免首次运行报错）
 if (-not (Test-Path 'C:\temp')) { New-Item -ItemType Directory -Force 'C:\temp' | Out-Null }
-# wb-relay-stop.ps1 —— 由桌面「停止WorkBuddy中转.cmd」调用
+# wb-relay-stop.ps1 —— 由 desktop\停止WorkBuddy中转.cmd 或桌面快捷方式调用
 # 停掉硬解三件套里的两个后台组件（自建 serve + relay），不动 WorkBuddy 本身
 
 $ErrorActionPreference = "Continue"
@@ -43,5 +43,5 @@ if ($left.Count -gt 0) { Write-Host "  仍被占用：$($left -join ', ')" -Fore
 else { Write-Host "  端口 $ServePort / $RelayPort 均已释放。WorkBuddy 本身不受影响。" -ForegroundColor DarkGray }
 
 Write-Host ""
-Write-Host "  想恢复：双击「启动WorkBuddy中转.cmd」" -ForegroundColor DarkGray
+Write-Host "  想恢复：双击桌面「WorkBuddy中转工具」并点「启动 / 修复」" -ForegroundColor DarkGray
 Write-Host ""

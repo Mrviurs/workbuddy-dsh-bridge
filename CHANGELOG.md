@@ -51,6 +51,26 @@
 - 文档：`REPORT.md`（架构/实测证据/换机预估）、`docs/ARCHITECTURE.md`（协议细节）、
   `docs/RUNBOOK.md`（运维手册）、`deploy/NEW-MACHINE.md`（换机部署清单）
 
+### 修复：分发可用性（别人 clone 下来根本用不了）
+
+发布后发现文档默认"桌面上已经有快捷方式"、`desktop/*.cmd` 里写死了作者本机路径、
+而仓库里又不含 exe —— 别人 clone 下来按手册操作，第一步就卡死。
+
+- **`desktop/*.cmd` 改为相对路径**：`%~dp0..\scripts\xxx.ps1`，在任何位置都能跑
+  （原来写的是 `%USERPROFILE%\Documents\deepseek-harness\...\workbuddy-dsh-bridge`，只有作者机器存在）
+- **新增 `install.ps1` + `一键安装.cmd`**：clone 后的唯一入口
+  · 检查 node / python / WorkBuddy 是否就绪
+  · **自动探测 WorkBuddy 的 codebuddy CLI 路径**并写进 `settings.psd1`（免去手填）
+  · 自动打包图形界面（有 PyInstaller 时）
+  · 在桌面创建「WorkBuddy中转工具 / -状态 / -停止」三个快捷方式
+  · 首次启动 + 自检。重复运行安全（幂等）
+- 手册（中英）从"四步"改成"五步"，新增第 2 步"安装（只需一次）"，
+  并明确写了"刚 clone 下来桌面上没有任何图标，exe 是本机现打包的"
+- 手册第 4 步补充：DSH 下拉里没有「脑力·」时，说明该机的 DSH 还没接上 provider
+- RUNBOOK / REPORT / NEW-MACHINE / README / bug_report 模板里所有
+  "双击桌面「xxx.cmd」"、"双击 exe"的表述，统一为安装后真实存在的图标名
+- CI 的 PowerShell 语法检查现已覆盖根目录的 `install.ps1`
+
 ### 仓库工程化（推送前审计）
 
 - `.github/workflows/ci.yml`：Python 语法、PowerShell 语法、配置模板可解析、

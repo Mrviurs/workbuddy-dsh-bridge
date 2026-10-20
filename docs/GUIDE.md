@@ -32,7 +32,7 @@ The bridge itself is tiny. It just sits between the two offices and **translates
 
 ---
 
-## 2. First run: four steps
+## 2. First run: five steps
 
 ### Step 1 · Open WorkBuddy and send it any message
 
@@ -45,7 +45,30 @@ WorkBuddy only hands over your credential while it's actually running. Sending a
 
 ---
 
-### Step 2 · Double-click "WorkBuddy中转工具" on your desktop
+### Step 2 · Install (once)
+
+> **Note: a freshly cloned repository puts nothing on your desktop.**
+> The shortcuts are created by the installer, and the .exe is built on your own
+> machine (binaries are not shipped in the repo).
+
+In the project folder, double-click **`一键安装.cmd`**.
+
+It does four things automatically (about 2 minutes, no input needed):
+
+1. checks node / python / WorkBuddy
+2. **finds where WorkBuddy is installed on your machine** and writes it into the config
+   (this is the step that saves you from editing paths by hand)
+3. builds the GUI (skipped if it already exists)
+4. creates three desktop shortcuts
+
+When it finishes you will see `=== 安装结束 ===` (setup complete) and the desktop icon appears.
+
+If it stops with an error (e.g. node missing), it tells you exactly what to install — fix that and
+double-click `一键安装.cmd` again. Re-running is safe.
+
+---
+
+### Step 3 · Double-click "WorkBuddy中转工具" on your desktop
 
 The icon is a blue square with **WB** in it.
 
@@ -73,7 +96,7 @@ A window appears:
 
 **Look at exactly one thing: are all three dots green?**
 
-- 🟢🟢🟢 All green → go to step 3.
+- 🟢🟢🟢 All green → go to step 4.
 - 🔴 Any red dot → click the blue **"Start / Repair"** button and wait 20–40 seconds (it works on its own; the log keeps scrolling).
   - When it stops, look again. Still red? Click **"Copy diagnostics"** in the top-right of the log and send me the text.
 
@@ -81,7 +104,7 @@ A window appears:
 
 ---
 
-### Step 3 · Open DSH and pick a model
+### Step 4 · Open DSH and pick a model
 
 Go back to DSH and open the model dropdown. Look for names that **start with `脑力·`** (it means "brainpower"):
 
@@ -100,11 +123,11 @@ Pick one and chat normally.
 | Situation | What to do |
 |---|---|
 | No such names in the dropdown at all | **Fully quit and reopen DSH** (config changes need a restart) |
-| Still missing after restart | Click "Copy diagnostics" in the app and send it to me — the DSH side isn't wired up yet |
+| Still missing after restart | This PC's DSH **isn't wired to the bridge yet**: either click "Copy diagnostics" and send it to me, or add the `config/cordis.patch.example.yml` block to your DSH profile yourself (see [README](../README.md)) |
 
 ---
 
-### Step 4 · Just use it
+### Step 5 · Just use it
 
 You can now work in DSH as usual. It can:
 

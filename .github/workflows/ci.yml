@@ -50,7 +50,7 @@ jobs:
       - name: PowerShell 语法检查
         run: |
           $errors = @()
-          $files = @(Get-ChildItem scripts -Recurse -Filter *.ps1)
+          $files = @(Get-ChildItem scripts -Recurse -Filter *.ps1) + @(Get-Item install.ps1)
           foreach ($f in $files) {
             $e = $null; $t = $null
             [void][System.Management.Automation.Language.Parser]::ParseFile($f.FullName, [ref]$t, [ref]$e)

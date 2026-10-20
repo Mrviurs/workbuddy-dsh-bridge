@@ -1,7 +1,7 @@
 ﻿
 # 运行时目录（本机固定 C:\temp；不存在时自动创建，避免首次运行报错）
 if (-not (Test-Path 'C:\temp')) { New-Item -ItemType Directory -Force 'C:\temp' | Out-Null }
-# wb-relay-status.ps1 —— 由桌面「WorkBuddy中转状态.cmd」调用
+# wb-relay-status.ps1 —— 由 desktop\WorkBuddy中转状态.cmd 或桌面快捷方式调用
 # 一眼看清硬解三件套：自建 serve(8791) / relay(8787) / token 有效期
 # 同时给出 DSH 侧配置是否对齐的提示
 
@@ -36,7 +36,7 @@ Write-Host ""
 Write-Host "【1】自建 serve（DSH 提示词作为 system 的那一端）" -ForegroundColor White
 $listenS = Get-NetTCPConnection -State Listen -LocalPort $ServePort -ErrorAction SilentlyContinue | Select-Object -First 1
 if (-not $listenS) {
-  Bad "未运行：$ServePort 没有监听 —— 双击「启动WorkBuddy中转.cmd」"
+  Bad "未运行：$ServePort 没有监听 —— 双击桌面「WorkBuddy中转工具」并点「启动 / 修复」"
 } else {
   $parent = (Get-CimInstance Win32_Process -Filter "ProcessId=$($listenS.OwningProcess)" -ErrorAction SilentlyContinue).ParentProcessId
   $pname = (Get-CimInstance Win32_Process -Filter "ProcessId=$parent" -ErrorAction SilentlyContinue).Name
@@ -46,7 +46,7 @@ if (-not $listenS) {
   try {
     $st = Invoke-RestMethod "http://127.0.0.1:$ServePort/api/v1/auth/status" -Headers @{ 'x-codebuddy-request' = '1' } -TimeoutSec 8
     if ($st.authenticated) { Ok "上游已登录（authEnabled=$($st.authEnabled) authenticated=$($st.authenticated)）" }
-    else { Bad "上游未登录 —— token 可能过期，双击启动脚本重扫" }
+    else { Bad "上游未登录 —— token 可能过期，双击桌面「WorkBuddy中转工具」点「启动 / 修复」重扫" }
   } catch { Warn "serve 探活失败：$($_.Exception.Message)" }
 }
 
@@ -55,7 +55,7 @@ Write-Host ""
 Write-Host "【2】relay（DSH 实际连接的 OpenAI 兼容口）" -ForegroundColor White
 $listenR = Get-NetTCPConnection -State Listen -LocalPort $RelayPort -ErrorAction SilentlyContinue | Select-Object -First 1
 if (-not $listenR) {
-  Bad "未运行：$RelayPort 没有监听 —— 双击「启动WorkBuddy中转.cmd」"
+  Bad "未运行：$RelayPort 没有监听 —— 双击桌面「WorkBuddy中转工具」并点「启动 / 修复」"
 } else {
   Ok "运行中 pid=$($listenR.OwningProcess)  http://127.0.0.1:$RelayPort/v1"
   $taskR = (& schtasks /query /tn $relayTask /fo LIST 2>$null | Select-String 'Status' | Select-Object -First 1)
@@ -82,11 +82,11 @@ if (-not (Test-Path $jwtPath)) {
 } else {
   $jwt = (Get-Content $jwtPath -Raw).Trim()
   $j = Get-JwtExp $jwt
-  if (-not $j -or -not $j.exp) { Warn "无法解析（len=$($jwt.Length)），双击启动脚本重扫" }
+  if (-not $j -or -not $j.exp) { Warn "无法解析（len=$($jwt.Length)），双击桌面「WorkBuddy中转工具」点「启动 / 修复」重扫" }
   else {
     $exp = [DateTimeOffset]::FromUnixTimeSeconds([long]$j.exp).LocalDateTime
     $left = [Math]::Round(($exp - (Get-Date)).TotalDays, 1)
-    if ($left -lt 0) { Bad "已过期（$exp）—— 打开 WorkBuddy 发一句话后双击启动脚本重扫" }
+    if ($left -lt 0) { Bad "已过期（$exp）—— 打开 WorkBuddy 发一句话后双击桌面「WorkBuddy中转工具」点「启动 / 修复」重扫" }
     elseif ($left -lt 3) { Warn "即将过期：$exp（剩 $left 天）" }
     else { Ok "有效：$exp（剩 $left 天）" }
     Write-Host "         长度 $($jwt.Length) 字符   sub=$($j.sub)   scope=$($j.scope)" -ForegroundColor DarkGray
@@ -110,6 +110,6 @@ if ((Get-Content (Join-Path $dshHome '.credentials.yaml') -Raw) -match 'WORKBUDD
 else { Bad "凭据占位 WORKBUDDY_LOCAL_KEY 缺失（会报 MISSING_CREDENTIAL）" }
 
 Write-Host ""
-Write-Host "提示：token 过期 / 报 401 → 打开 WorkBuddy 发一句话 → 双击「启动WorkBuddy中转.cmd」" -ForegroundColor DarkGray
+Write-Host "提示：token 过期 / 报 401 → 打开 WorkBuddy 发一句话 → 双击桌面「WorkBuddy中转工具」并点「启动 / 修复」" -ForegroundColor DarkGray
 Write-Host "      改过 cordis.patch.yml 的模型名或默认模型 → 需要重启 DSH 桌面端" -ForegroundColor DarkGray
 Write-Host ""

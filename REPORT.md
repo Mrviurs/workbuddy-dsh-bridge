@@ -19,7 +19,7 @@
 | 配置 | `config/settings.psd1` | **换机只需改这里**（CLI 路径 / python / 端口） |
 | 配置 | `config/wb-sysprompt.txt` | 自建 serve 的 system prompt 模板 |
 | 配置 | `config/cordis.patch.current.yml` | 本机 DSH patch 快照（workbuddy provider 段） |
-| 桌面 | `desktop/*.cmd` × 4 | 双击运行（启动 / 状态 / 停止 / 旧模式） |
+| 桌面 | `desktop/*.cmd` × 4 | 项目内相对路径运行；`install.ps1` 会在桌面创建快捷方式 |
 
 ---
 
@@ -122,7 +122,7 @@ relay (pythonw, 8787)                       ← 计划任务 WorkBuddyRelay
    - 端口冲突时改 `ServePort` / `RelayPort`
 2. DSH 侧：把 `config/cordis.patch.current.yml` 里的 `workbuddy` provider 段与
    `.credentials.yaml` 的 `WORKBUDDY_LOCAL_KEY` 加到目标机的 profile，然后重启 DSH。
-3. 桌面 `.cmd` 指向新路径（`desktop/` 里已备好，改 `%USERPROFILE%` 前缀即可）。
+3. 目标机上跑一次 `一键安装.cmd`：自动探测 CLI 路径、生成 settings.psd1、重建桌面快捷方式。
 
 ### 6.3 换机时会踩的坑（按发生概率排序）
 

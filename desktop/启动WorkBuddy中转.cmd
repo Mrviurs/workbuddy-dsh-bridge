@@ -1,5 +1,6 @@
 @echo off
 title WorkBuddy DSH Bridge - Start
-powershell -NoProfile -ExecutionPolicy Bypass -File "%USERPROFILE%\Documents\deepseek-harness\default-workspace\workbuddy-dsh-bridge\scripts\wb-clean-start.ps1"
+cd /d "%~dp0.."
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\scripts\wb-clean-start.ps1"
 echo.
 pause

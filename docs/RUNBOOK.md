@@ -4,9 +4,10 @@
 
 | 想做什么 | 怎么做 |
 |---|---|
-| 启动 / 重启 | 双击桌面「启动WorkBuddy中转.cmd」，或 `.\scripts\wb-clean-start.ps1` |
-| 看状态 | 双击「WorkBuddy中转状态.cmd」；四面板应全绿 |
-| 停止 | 双击「停止WorkBuddy中转.cmd」 |
+| 启动 / 重启 | 双击桌面「WorkBuddy中转工具」，或 `.\scripts\wb-clean-start.ps1` |
+| 桌面没有图标 | 运行项目根目录的 `一键安装.cmd`（clone 下来是没有快捷方式的） |
+| 看状态 | 双击桌面「WorkBuddy中转-状态」；四面板应全绿 |
+| 停止 | 双击桌面「WorkBuddy中转-停止」（或在工具界面点「停止」） |
 | 换模型 | 在 DSH 的模型下拉里选 `脑力·xxx (WB)`（DSH 重启后可见） |
 | 切回原生 | 模型下拉选不带「脑力·」前缀的（默认就是 `deepseek-account`） |
 
@@ -14,7 +15,7 @@
 
 ### A. DSH 报 `Connection error`
 1. 跑状态脚本 → 【2】relay 是否在跑
-2. 没跑 → 双击启动脚本
+2. 没跑 → 双击桌面「WorkBuddy中转工具」，点「启动 / 修复」
 3. 在跑但仍报错 → 看 `C:\temp\wb-relay.log` 尾部
 
 ### B. DSH 报 429 / 提示"被限流"
@@ -60,7 +61,7 @@ token 过期（有效期约 30 天）。处置：
 
 见 `REPORT.md` 第 6 节。最短路径：
 1. 改 `config/settings.psd1` 的 `CodebuddyCli`（和必要时 `PythonExe` / 端口）
-2. 拷整个项目目录 + 桌面四个 cmd
+2. 拷整个项目目录，在目标机双击 `一键安装.cmd`（会重建快捷方式、自动探测 CLI 路径）
 3. 目标机上打开 WorkBuddy 并登录，发一句话
 4. 跑启动脚本（token 会在新机器重新扫描，不要拷 `wb-jwt.txt`）
 5. 在目标机的 DSH profile 里加 `workbuddy` provider 与 `WORKBUDDY_LOCAL_KEY`

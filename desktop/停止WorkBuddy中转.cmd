@@ -1,5 +1,6 @@
 @echo off
 title WorkBuddy DSH Bridge - Stop
-powershell -NoProfile -ExecutionPolicy Bypass -File "%USERPROFILE%\Documents\deepseek-harness\default-workspace\workbuddy-dsh-bridge\scripts\wb-relay-stop.ps1"
+cd /d "%~dp0.."
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\scripts\wb-relay-stop.ps1"
 echo.
 pause

@@ -105,10 +105,14 @@ notepad config\settings.psd1
 > `Get-ChildItem C:\,D:\ -Recurse -Filter codebuddy -ErrorAction SilentlyContinue | Where-Object { $_.FullName -like '*app.asar.unpacked\cli\bin\codebuddy' }`
 
 ```powershell
-# 1) 启动：取 token → 起自建 serve(8791) → 起 relay(8787) → 双向自测
+# 1) 一键安装：探测 CLI 路径 → 写配置 → 打包界面 → 建桌面快捷方式 → 首次启动
+#    直接双击项目根目录的「一键安装.cmd」效果相同
 Set-ExecutionPolicy -Scope Process Bypass -Force
-.\scripts\wb-clean-start.ps1
+.\install.ps1
 ```
+
+> 之后日常使用只需双击桌面的「WorkBuddy中转工具」。
+> 只想启动服务、不做安装：`.\scripts\wb-clean-start.ps1`
 
 ```powershell
 # 2) 在 DSH 的 profile 里加 provider（见 config\cordis.patch.example.yml）
@@ -116,7 +120,7 @@ Set-ExecutionPolicy -Scope Process Bypass -Force
 #    然后重启 DSH，模型下拉里会出现「脑力·xxx」
 ```
 
-想要图形界面：构建（见下）后双击 `ui\dist\WorkBuddyRelayUI\WorkBuddyRelayUI.exe`。
+图形界面由 `install.ps1` 自动打包；也可手动执行下面的构建命令，然后双击 `ui\dist\WorkBuddyRelayUI\WorkBuddyRelayUI.exe`。
 
 ---
 
