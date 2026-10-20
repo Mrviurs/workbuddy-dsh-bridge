@@ -33,6 +33,21 @@
 - 文档：`REPORT.md`（架构/实测证据/换机预估）、`docs/ARCHITECTURE.md`（协议细节）、
   `docs/RUNBOOK.md`（运维手册）、`deploy/NEW-MACHINE.md`（换机部署清单）
 
+### 仓库工程化（推送前审计）
+
+- `.github/workflows/ci.yml`：Python 语法、PowerShell 语法、配置模板可解析、
+  凭据特征扫描（特征串拆分拼接，避免扫描器自命中）、本机配置未被追踪
+- `.github/ISSUE_TEMPLATE/bug_report.yml` + `config.yml` + `PULL_REQUEST_TEMPLATE.md`
+- `requirements.txt`（pystray / Pillow / pyinstaller）、`.gitattributes`（脚本 CRLF、其余 LF）
+- 运行时目录 `C:\temp` 缺失时自动创建（7 个脚本 + relay + UI 三层兜底）
+- **relay 会话自愈**：上游 serve 重启会让 ACP 会话失效，现在首次失败会自动重置会话并重试一次
+  （429 限流不重试，避免放大配额消耗）
+- **启动脚本三重防护**：
+  - 缺 `config/settings.psd1` 时自动从示例复制并提示要改哪一行
+  - `CodebuddyCli` 还是 `<占位符>` 时报明确错误（而不是"找不到 CLI"）
+  - 计划任务命令超过 261 字符（schtasks 上限）时提前拦截并建议换短路径
+- `settings.psd1` 去掉不生效的 `RuntimeDir` 字段（运行时目录固定 `C:\temp`，由脚本自动创建）
+
 ### 踩过并修掉的坑（供后来者避雷）
 
 | 坑 | 现象 | 处理 |

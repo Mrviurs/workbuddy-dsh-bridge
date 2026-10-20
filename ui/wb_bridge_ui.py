@@ -21,6 +21,10 @@ from tkinter import font as tkfont
 from tkinter import messagebox, ttk
 
 UI_LOG = r"C:\temp\wb-ui.log"
+try:
+    os.makedirs(os.path.dirname(UI_LOG), exist_ok=True)
+except Exception:
+    pass
 try:                                     # 日志文件可能被上一次运行占用，绝不能因此崩掉
     from logging.handlers import RotatingFileHandler
     _h = RotatingFileHandler(UI_LOG, maxBytes=200_000, backupCount=2,

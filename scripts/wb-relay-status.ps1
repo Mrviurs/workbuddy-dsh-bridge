@@ -1,4 +1,7 @@
-﻿# wb-relay-status.ps1 —— 由桌面「WorkBuddy中转状态.cmd」调用
+﻿
+# 运行时目录（本机固定 C:\temp；不存在时自动创建，避免首次运行报错）
+if (-not (Test-Path 'C:\temp')) { New-Item -ItemType Directory -Force 'C:\temp' | Out-Null }
+# wb-relay-status.ps1 —— 由桌面「WorkBuddy中转状态.cmd」调用
 # 一眼看清硬解三件套：自建 serve(8791) / relay(8787) / token 有效期
 # 同时给出 DSH 侧配置是否对齐的提示
 

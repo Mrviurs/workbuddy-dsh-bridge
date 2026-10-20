@@ -5,12 +5,24 @@
   [int]$RelayPort = 0
 )
 
+
+# 运行时目录（本机固定 C:\temp；不存在时自动创建，避免首次运行报错）
+if (-not (Test-Path 'C:\temp')) { New-Item -ItemType Directory -Force 'C:\temp' | Out-Null }
 # 硬解模式：自建干净 codebuddy serve + relay
 # 效果：DSH 的提示词真正成为 system、上游没有任何工具（不越权）、工具调用走 DSH
 
 $ErrorActionPreference = "Continue"
 $root = Split-Path -Parent $PSScriptRoot
 $cfgPath = Join-Path $root 'config\settings.psd1'
+if (-not (Test-Path $cfgPath)) {
+  $example = Join-Path $root 'config\settings.example.psd1'
+  if (Test-Path $example) {
+    Copy-Item $example $cfgPath -Force
+    Write-Host "  [WARN] 未找到 config\settings.psd1，已从示例复制一份 —— 请把 CodebuddyCli 改成你的实际安装路径后重跑。" -ForegroundColor Yellow
+  } else {
+    Write-Host "  [WARN] 未找到 config\settings.psd1，将使用内置默认值。" -ForegroundColor Yellow
+  }
+}
 $S = @{}
 if (Test-Path $cfgPath) { try { $S = Import-PowerShellDataFile $cfgPath } catch { Write-Host "  [WARN] settings.psd1 解析失败，用内置默认" -ForegroundColor Yellow } }
 $relayPy = Join-Path $root 'relay\workbuddy-openai-relay.py'
@@ -97,6 +109,11 @@ foreach ($port in @($ServePort, $RelayPort)) {
 
 # ---------- 4. 起自建 serve（计划任务；用 PS 脚本避免 cmd 的 1023 字符环境变量截断）----------
 $cli = if ($S.CodebuddyCli) { $S.CodebuddyCli } else { 'D:\WorkBuddy\resources\app.asar.unpacked\cli\bin\codebuddy' }
+if ($cli -match '[<>]') {
+  Bad "settings.psd1 里的 CodebuddyCli 还是占位符：$cli"
+  Write-Host "        改成 <WorkBuddy安装目录>\resources\app.asar.unpacked\cli\bin\codebuddy 的真实路径（搜一下：Get-ChildItem C:\,D:\ -Recurse -Filter codebuddy）" -ForegroundColor Yellow
+  exit 1
+}
 if (-not (Test-Path $cli)) {
   Bad "找不到 codebuddy CLI：$cli"
   Write-Host "        请在 config\settings.psd1 里把 CodebuddyCli 指到目标机的 <WorkBuddy安装目录>\resources\app.asar.unpacked\cli\bin\codebuddy" -ForegroundColor Yellow
@@ -173,6 +190,11 @@ if (-not $pythonW -or -not (Test-Path $pythonW)) {
 }
 Ok "pythonw: $pythonW"
 $rtr = "`"$pythonW`" `"$relayPy`" --log `"$relayLog`""
+if ($rtr.Length -gt 258) {
+  Bad "计划任务命令过长（$($rtr.Length)/261 字符）：$rtr"
+  Write-Host "        Windows 的 schtasks /tr 上限 261 字符。请把项目移到更短的路径（例如 C:\wb-bridge），或把 Python 装到短路径。" -ForegroundColor Yellow
+  exit 1
+}
 & schtasks /create /tn $relayTask /tr $rtr /sc once /st 23:59 /f 2>&1 | Out-Null
 & schtasks /run /tn $relayTask 2>&1 | Out-Null
 

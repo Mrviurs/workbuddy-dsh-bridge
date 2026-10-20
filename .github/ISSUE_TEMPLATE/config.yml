@@ -1,0 +1,8 @@
+﻿blank_issues_enabled: false
+contact_links:
+  - name: 先看文档
+    url: https://github.com/Mrviurs/workbuddy-dsh-bridge#排障
+    about: README 的排障表 + deploy/NEW-MACHINE.md 覆盖了大部分"跑不起来"
+  - name: 这是 WorkBuddy 侧的变化，不是本项目的 bug
+    url: https://github.com/Mrviurs/workbuddy-dsh-bridge/blob/main/CHANGELOG.md
+    about: 依赖上游内部接口，对方升级后失效属于预期风险

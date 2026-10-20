@@ -136,6 +136,12 @@ def acp_call(conn, payload, timeout=90):
 
 
 # ---------------------------------------------------------------- ACP session
+def _reset_session():
+    """上游 serve 重启后 ACP 会话会失效；清空缓存让下一次请求重新握手。"""
+    STATE.update({"conn": None, "session": None, "model": None, "mode": None})
+    log("[acp] session 已重置")
+
+
 def ensure_session():
     if STATE["session"]:
         return STATE["session"]
@@ -455,24 +461,34 @@ class Relay(BaseHTTPRequestHandler):
         with LOCK:
             err = None
             err_code = 502
-            try:
-                ensure_session()
-                set_model(up_model)
-                set_mode(UPSTREAM_MODE)
-                raw = run_agent(prompt)
-            except urllib.error.HTTPError as e:
-                body = e.read().decode("utf-8", "replace")
-                if e.code == 429:
-                    err_code = 429
-                    err = ("WorkBuddy 账号被限流（429 RATE_LIMITED）。"
-                           "这是上游配额/频率限制，等 1-15 分钟再试，或切回原生模型。"
-                           f" 上游原文: {body[:200]}")
-                else:
+            raw = ""
+            for _attempt in (0, 1):
+                try:
+                    ensure_session()
+                    set_model(up_model)
+                    set_mode(UPSTREAM_MODE)
+                    raw = run_agent(prompt)
+                    err = None
+                    break
+                except urllib.error.HTTPError as e:
+                    body = e.read().decode("utf-8", "replace")
+                    if e.code == 429:                     # 限流不重试
+                        err_code = 429
+                        err = ("WorkBuddy 账号被限流（429 RATE_LIMITED）。"
+                               "这是上游配额/频率限制，等 1-15 分钟再试，或切回原生模型。"
+                               f" 上游原文: {body[:200]}")
+                        raw = ""
+                        break
                     err = f"upstream HTTP {e.code}: {body[:400]}"
-                raw = ""
-            except Exception as e:  # noqa: BLE001
-                err = str(e)
-                raw = ""
+                    raw = ""
+                except Exception as e:  # noqa: BLE001
+                    err = str(e)
+                    raw = ""
+                if _attempt == 0:                          # 可能是 serve 重启导致会话失效
+                    log(f"[retry] 首次失败（{err}），重置会话后重试一次")
+                    _reset_session()
+                    continue
+                break
 
         if err and not raw:
             self._send_json(err_code, {"error": err})
@@ -536,7 +552,17 @@ def log(msg):
         pass
 
 
+def _ensure_runtime_dir():
+    """运行时目录固定 C:\\temp，缺失时自动创建。"""
+    for _d in (r"C:\temp",):
+        try:
+            os.makedirs(_d, exist_ok=True)
+        except Exception:
+            pass
+
+
 def main():
+    _ensure_runtime_dir()
     global BASE, PWD, UPSTREAM_MODE, SYSTEM_MODE, SYSTEM_TAIL_CHARS
     ap = argparse.ArgumentParser()
     ap.add_argument("--port", type=int, default=None)

@@ -1,5 +1,8 @@
 ﻿param([Parameter(Mandatory=$true)][int]$ProcessId, [switch]$Everything)
 
+
+# 运行时目录（本机固定 C:\temp；不存在时自动创建，避免首次运行报错）
+if (-not (Test-Path 'C:\temp')) { New-Item -ItemType Directory -Force 'C:\temp' | Out-Null }
 $src = @"
 using System;
 using System.Text;

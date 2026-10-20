@@ -7,5 +7,4 @@
     ServePort     = 8791
     RelayPort     = 8787
     DshHome       = ''      # 留空用 %USERPROFILE%\.dsh
-    RuntimeDir    = ''      # 留空用 %TEMP%
 }

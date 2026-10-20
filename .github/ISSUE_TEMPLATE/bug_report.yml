@@ -1,0 +1,57 @@
+﻿name: 问题反馈
+description: 功能不正常 / 报错 / 行为与文档不符
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 先做两件事
+        1. 跑一次无界面诊断，把输出贴上来：
+           ```
+           WorkBuddyRelayUI.exe --diagnose
+           ```
+           没有 exe 的话用：`powershell -File scripts\wb-clean-start.ps1` 的屏幕输出
+        2. **不要贴任何形如 `eyJ...` 的长串**（那是账号凭据），日志里的 token 请先删干净
+
+        ## 先确认不是这几类（大概率已有答案）
+        - 报「CodebuddyCli 还是占位符」→ 见 README 第 0 步
+        - 报「需要 WorkBuddy 在运行」→ 打开 WorkBuddy 发一句话再试
+        - 报 401 / 未登录 → token 过期（约 30 天），重跑启动脚本自动重扫
+        - 报「计划任务命令过长」→ 项目路径太深，换到 `C:\wb-bridge` 之类
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 现象
+      description: 你做了什么、期望什么、实际发生了什么
+      placeholder: |
+        1. 双击 exe → 点启动 / 修复
+        2. 日志出现 ...
+        3. DSH 里报 ...
+    validations:
+      required: true
+  - type: textarea
+    id: diagnose
+    attributes:
+      label: 诊断输出
+      description: WorkBuddyRelayUI.exe --diagnose 的完整输出（记得删掉 token）
+      render: text
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: 版本
+      placeholder: "WorkBuddy 5.8.3 / Windows 11 26200 / Python 3.11.9 / PowerShell 5.1"
+    validations:
+      required: true
+  - type: dropdown
+    id: mode
+    attributes:
+      label: 运行模式
+      options:
+        - 硬解模式（wb-clean-start，自建 serve）
+        - 旧模式（wb-relay-start，绑 WorkBuddy 自己的 serve）
+        - 不确定
+    validations:
+      required: true

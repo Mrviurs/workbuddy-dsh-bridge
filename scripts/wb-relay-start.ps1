@@ -8,6 +8,9 @@
 
 param([switch]$SkipSelfTest, [ValidateSet("tail","full","none")][string]$SystemMode = "tail")
 
+
+# 运行时目录（本机固定 C:\temp；不存在时自动创建，避免首次运行报错）
+if (-not (Test-Path 'C:\temp')) { New-Item -ItemType Directory -Force 'C:\temp' | Out-Null }
 $ErrorActionPreference = "Continue"
 $root = Split-Path -Parent $PSScriptRoot
 $readEnv = Join-Path $PSScriptRoot 'wb-read-env.ps1'

@@ -60,11 +60,18 @@ cd workbuddy-dsh-bridge
 
 ### 三步
 
+> **⚠️ 第 0 步必做**：仓库里**没有** `config/settings.psd1`（它是本机配置，已被 gitignore）。
+> 首次运行前必须从模板复制一份，并把 `CodebuddyCli` 改成你自己的 WorkBuddy 安装路径，
+> 否则启动脚本会报「CodebuddyCli 还是占位符」。
+
 ```powershell
-# 0) 复制模板配置（第一次需要）
 copy config\settings.example.psd1 config\settings.psd1
-notepad config\settings.psd1        # 只改 CodebuddyCli 为你的 WorkBuddy 安装路径
+notepad config\settings.psd1
+# 只改这一行：CodebuddyCli = '<你的WorkBuddy安装目录>\resources\app.asar.unpacked\cli\bin\codebuddy'
 ```
+
+> 不确定路径？搜一下：
+> `Get-ChildItem C:\,D:\ -Recurse -Filter codebuddy -ErrorAction SilentlyContinue | Where-Object { $_.FullName -like '*app.asar.unpacked\cli\bin\codebuddy' }`
 
 ```powershell
 # 1) 启动：取 token → 起自建 serve(8791) → 起 relay(8787) → 双向自测
