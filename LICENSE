@@ -1,5 +1,5 @@
-NONCOMMERCIAL SOURCE-AVAILABLE LICENSE
-Version 1.0
+PERSONAL-USE & COMMERCIAL-BY-PERMISSION LICENSE
+Version 1.1
 
 Copyright (c) 2026 lynx
 Project: workbuddy-dsh-bridge
@@ -7,14 +7,14 @@ Project: workbuddy-dsh-bridge
 
 ────────────────────────────────────────────────────────────────────────────
 
-PLEASE READ THIS FIRST
+SUMMARY (plain words, the numbered clauses below govern)
 
-This is NOT an OSI-approved open source license. The source is available for
-reading, personal use, and modification, but COMMERCIAL USE IS PROHIBITED.
+  · Personal / non-commercial use .............. FREE, no need to ask
+  · Commercial use ............................. ALLOWED AFTER WRITTEN PERMISSION
+  · Some harmful uses .......................... NEVER allowed, even with permission
 
-If you need a mature, lawyer-reviewed noncommercial license instead of this
-one, the closest match is PolyForm Noncommercial 1.0.0:
-<https://polyformproject.org/licenses/noncommercial/1.0.0/>
+This is a source-available license, not an OSI-approved open source license
+(commercial use is not granted automatically).
 
 ────────────────────────────────────────────────────────────────────────────
 
@@ -23,57 +23,78 @@ one, the closest match is PolyForm Noncommercial 1.0.0:
 "Software" means the source code, scripts, documentation, configuration
 templates, and any accompanying files in this project.
 
-"You" means the individual exercising rights under this license.
+"You" means the individual or legal entity exercising rights under this
+license.
 
-"Commercial Use" means any use that is intended for or directed toward
-commercial advantage or monetary compensation, including but not limited to:
-use in the operations of a business; use to deliver paid products or services;
-use in the development of a product offered for sale; use by a for-profit
-entity for its internal workflows; or use to generate advertising, affiliate,
-or subscription revenue.
+"Commercial Use" means any use intended for or directed toward commercial
+advantage or monetary compensation, including: use in the operations of a
+business; use to deliver paid products or services; use in developing a
+product offered for sale; use by a for-profit entity for internal workflows;
+or use to generate advertising, affiliate, or subscription revenue.
 
-2. GRANT OF RIGHTS
+"Commercial License" means a separate written permission granted by the
+copyright holder that authorizes Commercial Use, possibly subject to
+additional terms or fees.
 
-Subject to your full compliance with this license, you are granted a
-worldwide, royalty-free, non-exclusive, non-transferable right to:
+2. GRANT FOR PERSONAL, NON-COMMERCIAL USE
+
+Subject to your compliance with this license, you are granted a worldwide,
+royalty-free, non-exclusive, non-transferable right to:
 
   (a) run the Software on devices you own or control, for personal,
       non-commercial purposes;
 
   (b) read, study, and modify the source code for those purposes;
 
-  (c) share unmodified copies of the Software with other individuals, provided
-      they receive this license in full and agree to it.
+  (c) share unmodified copies of the Software with other individuals,
+      provided they receive this license in full and agree to it.
 
-3. PROHIBITED USES
+No permission is needed for any use covered by this section.
 
-You may NOT:
+3. COMMERCIAL USE — BY PERMISSION
 
-  (a) use the Software for any Commercial Use;
+  (a) Commercial Use is permitted ONLY if you have obtained a Commercial
+      License from the copyright holder.
 
-  (b) sell, rent, lease, sublicense, publish for payment, or otherwise charge
-      any fee for the Software itself or for access to it;
+  (b) To request one, open an issue titled "[Commercial License]" or contact
+      the author through the repository. Include: who you are, what you intend
+      to do, and at what scale.
 
-  (c) operate the Software, or any derivative of it, as a hosted, managed, or
-      "as a service" offering for third parties;
+  (c) Until a Commercial License is granted in writing, Commercial Use is not
+      authorized. Silence, an unanswered request, or a "maybe" is NOT
+      permission.
 
-  (d) bundle or redistribute the Software as part of a commercial product,
-      commercial distribution channel, paid course, or paid bundle;
+  (d) A Commercial License may carry additional terms, scope limits, or fees.
+      It applies only to the party and scope named in it, and is not
+      transferable.
 
-  (e) use the Software to extract, collect, bundle, resell, pool, proxy, or
+  (e) If you are unsure whether your use counts as Commercial Use, ask before
+      you deploy. Asking is free.
+
+4. USES NEVER PERMITTED (regardless of any license)
+
+Even with a Commercial License, you may NOT:
+
+  (a) use the Software to extract, collect, bundle, resell, pool, proxy, or
       redistribute any other person's account credentials, access tokens, or
       model quota;
 
-  (f) use the Software to circumvent, avoid, or reduce fees owed to any
+  (b) use the Software to circumvent, avoid, or reduce fees owed to any
       third-party product or service;
 
-  (g) remove, obscure, or alter this license, the copyright notice, or any
+  (c) operate the Software as a mass-registration, multi-account, or
+      credential-harvesting service;
+
+  (d) use the Software for any unlawful purpose, or in violation of the terms
+      of service of any third-party product it interacts with;
+
+  (e) remove, obscure, or alter this license, the copyright notice, or any
       attribution notice in the Software;
 
-  (h) use the Software for any unlawful purpose, or in violation of the terms
-      of service of any third-party product it interacts with.
+  (f) present the Software, or a derivative of it, as being endorsed by, or
+      affiliated with, the author or any third-party product vendor.
 
-4. CONDITIONS
+5. CONDITIONS
 
   (a) Any copy of the Software, in whole or in part, must include this license
       verbatim.
@@ -84,7 +105,7 @@ You may NOT:
   (c) You are solely responsible for determining whether your use complies with
       the terms of service, laws, and regulations that apply to you.
 
-5. NO WARRANTY
+6. NO WARRANTY
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -93,7 +114,7 @@ NOT WARRANT THAT THE SOFTWARE WILL FUNCTION UNINTERRUPTED, ERROR-FREE, OR AT
 ALL — IN PARTICULAR, IT DEPENDS ON UNDOCUMENTED INTERFACES OF THIRD-PARTY
 SOFTWARE THAT MAY CHANGE OR DISAPPEAR AT ANY TIME.
 
-6. LIMITATION OF LIABILITY
+7. LIMITATION OF LIABILITY
 
 TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL THE
 AUTHOR BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR
@@ -102,7 +123,7 @@ OR SERVICE QUOTA, HOWEVER CAUSED AND UNDER ANY THEORY OF LIABILITY, ARISING OUT
 OF OR RELATED TO YOUR USE OF OR INABILITY TO USE THE SOFTWARE, EVEN IF ADVISED
 OF THE POSSIBILITY OF SUCH DAMAGE.
 
-7. INDEMNITY
+8. INDEMNITY
 
 You agree to indemnify, defend, and hold harmless the author from and against
 any claims, damages, liabilities, costs, and expenses (including reasonable
@@ -110,21 +131,24 @@ legal fees) arising out of or related to: (i) your use of the Software; (ii) any
 claim by a third-party service provider or account holder relating to your use;
 or (iii) your breach of this license.
 
-8. TERMINATION
+9. TERMINATION
 
-Your rights under this license terminate automatically and immediately if you
-breach any of its terms. On termination you must stop using the Software and
-destroy all copies in your possession.
+  (a) Your rights under this license terminate automatically and immediately if
+      you breach any of its terms.
 
-9. SEPARATE COMMERCIAL TERMS
+  (b) A Commercial License terminates as stated in its own terms, or
+      immediately if you breach this license.
 
-Commercial use may be licensed separately, at the author's sole discretion, by
-written agreement. Absence of a reply is not permission.
+  (c) On termination you must stop using the Software and destroy all copies in
+      your possession.
 
 10. MISCELLANEOUS
 
-  (a) This license is the entire agreement concerning the Software.
+  (a) This license plus any granted Commercial License is the entire agreement
+      concerning the Software.
+
   (b) If any provision is held unenforceable, the remaining provisions stay in
       force.
+
   (c) This text is not legal advice. If you need certainty, consult a lawyer in
       your jurisdiction.

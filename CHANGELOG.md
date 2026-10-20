@@ -6,10 +6,11 @@
 
 ### 变更
 
-- **许可证从 MIT 改为 [Noncommercial Source-Available License v1.0](LICENSE)**：
-  源码可见、可读、可改、个人免费使用，**禁止商业使用**。
-  注意：改后本项目**不再属于 OSI 定义的"开源软件"**（OSI 要求允许商业使用），
-  准确说法是 source-available。
+- **许可证从 MIT 改为 [Personal-Use & Commercial-By-Permission License v1.1](LICENSE)**（双许可模式）：
+  个人非商业使用免费、无需申请；**商业使用需事先取得书面授权**（开 issue 标题 `[Commercial License]`）。
+  另有若干用途**即使获得授权也永远不允许**（转售他人服务、做中转站对外供 API、
+  批量账号 / 代他人提取凭据、绕过官方付费、移除许可声明后分发）。
+  因为商用不是自动授予，本项目**不属于 OSI 定义的"开源软件"**，准确说法是 source-available + dual licensing。
 - 新增 [DISCLAIMER.md](DISCLAIMER.md)（中文）与 [DISCLAIMER.en.md](DISCLAIMER.en.md)（English）：
   逐条列明软件的真实行为（读进程内存 / 本地存 token / 注册计划任务 / 转发对话）、
   账号与技术风险、明确禁止用途、担保与责任限制、合规责任归属。

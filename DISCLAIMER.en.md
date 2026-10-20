@@ -79,19 +79,21 @@ The Software depends on **undocumented internal interfaces** of the WorkBuddy cl
 
 ## 4. Prohibited uses
 
-Beyond the noncommercial restriction in [LICENSE](LICENSE), the following are **expressly forbidden**:
+Per [LICENSE](LICENSE): **personal non-commercial use is free and needs no request; commercial use requires prior written permission; the uses below are never allowed, even with a commercial license.**
 
 | Prohibited | Why |
 |---|---|
-| **Commercial use** (internal business workflows, paid services, commercial product integration) | See LICENSE §3. Obtain written permission first |
-| **Reselling, renting, reselling access, or charging for access** | You would be reselling someone else's service, not this Software |
-| **Running it as a relay/proxy offering an API to others** | Directly violates upstream terms and shifts risk onto the author |
-| **Mass account registration, account pooling, extracting other people's credentials** | Abuse of the upstream service; not this project's purpose |
-| **Helping others bypass official payment or licensing** | Unrelated to this project and potentially unlawful |
-| **Redistributing after removing copyright or license notices** | Violates LICENSE §3(a) and §3(g) |
-| **Any unlawful purpose, or any use violating upstream terms of service** | Liability rests with the person acting, not the tool |
+| **Unauthorized commercial use** (internal business workflows, paid services, commercial product integration) | See LICENSE §3. Commercial use is **not permanently banned — it requires prior written permission**. Open an issue titled `[Commercial License]` describing your use |
+| **Reselling, renting, or charging for access** | You would be reselling someone else's service, not this Software; not covered by a commercial license either |
+| **Running it as a relay/proxy offering an API to others** | Violates upstream terms and shifts risk onto the author; never licensed |
+| **Mass registration, account pooling, extracting other people's credentials** | Abuse of the upstream service; never licensed |
+| **Helping others bypass official payment or licensing** | Unrelated to this project and potentially unlawful; never licensed |
+| **Redistributing after removing copyright or license notices** | Violates LICENSE §4(e) and §5(a) |
+| **Any unlawful purpose, or use violating upstream terms of service** | Liability rests with the person acting, not the tool; never licensed |
 
-If your scenario requires any of the above, **this project is not for you**.
+**Two categories, keep them apart:**
+- *Commercial use of the Software itself* — come and ask; if granted, you may use it;
+- *Abusing someone else's service* (reselling their access, running it as a relay, harvesting credentials, dodging fees) — a license will never cover that, because it stops being "using software".
 
 ---
 
@@ -125,14 +127,16 @@ you have made it yourself.
 
 ## 7. Licensing status, stated precisely
 
-- This project uses the **[Noncommercial Source-Available License v1.0](LICENSE)**:
-  source is readable, modifiable, and free for personal use — **commercial use is prohibited**.
-- Strictly speaking it is therefore **not OSI open source** (the OSI definition requires allowing
-  commercial use). The accurate term is **source-available**.
-- If you want a more legally mature noncommercial text, consider
-  [PolyForm Noncommercial 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0/).
-  If you want true open source (commercial use allowed), switch to MIT / Apache-2.0 — but that
-  contradicts "no commercial use". The trade-off is yours to make.
+- This project uses the **[Personal-Use & Commercial-By-Permission License v1.1](LICENSE)**:
+  source is readable and modifiable, **personal non-commercial use is free and needs no request**, and
+  **commercial use requires prior written permission**.
+- Because commercial use is not granted automatically, it is **not OSI open source** (the OSI
+  definition requires commercial freedom without extra permission). The accurate terms are
+  **source-available + dual licensing**.
+- For a more legally mature version of this model, see
+  [PolyForm Noncommercial 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0/)
+  paired with a separate commercial agreement. To go fully permissive (commercial free of charge),
+  switch to MIT / Apache-2.0.
 
 ---
 
@@ -143,4 +147,4 @@ This disclaimer may be updated as the project evolves. Updates appear in git his
 
 ---
 
-**One line: this is a tool for one person using their own computer. If something goes wrong, it's your problem, not anyone else's.**
+**One line: personal use is free, commercial use needs a quick ask, and abusing someone else's service is never allowed at any price. If something goes wrong, it's your problem, not anyone else's.**

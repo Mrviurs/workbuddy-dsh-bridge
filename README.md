@@ -1,6 +1,6 @@
 # workbuddy-dsh-bridge
 
-[![License: Noncommercial](https://img.shields.io/badge/license-Noncommercial-orange.svg)](LICENSE)
+[![License: Personal Free · Commercial By Permission](https://img.shields.io/badge/license-personal%20free%20%C2%B7%20commercial%20by%20permission-orange.svg)](LICENSE)
 [![OSI Open Source](https://img.shields.io/badge/OSI%20open%20source-no-red.svg)](#license)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-0078D4)](#)
 [![PowerShell](https://img.shields.io/badge/PowerShell-5.1%2B-5391FE)](#)
@@ -42,12 +42,12 @@
 - `wb-jwt.txt` 里的 token **约等于账号密码**，泄露后果自负；
 - 本软件会修改 DSH 配置并注册计划任务，配置混乱 / 数据丢失风险自负。
 
-**四、明确禁止**
-🚫 **商业使用**（含企业内部流程、付费服务、商业产品集成）　🚫 转售 / 出租 / 代充 / 售卖访问权
-🚫 做成"中转站"对外提供 API　🚫 批量注册 / 多账号池 / 代他人提取凭据
-🚫 帮助他人绕过官方付费或授权　🚫 移除版权与许可声明后再分发　🚫 任何违法或违反上游条款的用途
+**四、商用与禁止用途**
+- ✅ **个人非商业使用**：免费，不需要申请
+- 🤝 **商业使用**：**允许，但需事先取得书面授权** —— 开个 issue 标题写 `[Commercial License]`，说明你是谁、要做什么、多大规模
+- 🚫 **授权也不覆盖**：转售 / 出租 / 代充 / 售卖访问权、做成"中转站"对外供 API、批量注册 / 多账号池 / 代他人提取凭据、帮助他人绕过官方付费、移除版权许可声明后分发、任何违法或违反上游条款的用途
 
-需要上述任何一项的场景，**这个项目不适合你**。
+分两类看清楚：**"用这个软件做商业"可以谈；"滥用上游服务"给多少钱都不行。**
 
 **五、担保与责任**
 按"AS IS"提供，无任何担保；作者不承担间接 / 附带 / 后果性损害（含利润、数据、凭据、账号、额度损失）；
@@ -208,13 +208,18 @@ python -m PyInstaller --noconfirm --onedir --noconsole --name WorkBuddyRelayUI `
 
 ## License
 
-**[Noncommercial Source-Available License v1.0](LICENSE)** —— 源码可见、可读、可改、个人免费使用，
-**禁止商业使用**。
+**[Personal-Use & Commercial-By-Permission License v1.1](LICENSE)** —— 双许可模式：
 
-> 严格来说本项目**不属于 OSI 定义的"开源软件"**（OSI 要求允许商业使用），
-> 准确说法是 **source-available（源码可用）**。
-> 需要更成熟的法律文本可考虑 [PolyForm Noncommercial 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0/)；
-> 想真正开源（允许商用）则改用 MIT / Apache-2.0 —— 但那与"禁止商用"矛盾，取舍在你。
+| 用途 | 是否需要申请 |
+|---|---|
+| 个人 / 非商业使用（读、改、跑） | **免费，不需要申请** |
+| 商业使用（企业内部流程、付费服务、商业产品集成） | **需事先取得书面授权** |
+
+**怎么申请商用授权**：开一个 issue，标题写 `[Commercial License]`，内容说明：你是谁 / 打算做什么 / 大概什么规模。看到会回。
+（沉默不等于同意 —— 没收到明确答复之前，商业使用仍未授权。）
+
+> 因为商用不是自动授予，所以本项目**不属于 OSI 定义的"开源软件"**，
+> 准确说法是 **source-available（源码可用）+ 双许可**。
 
 使用前请先读 [DISCLAIMER.md](DISCLAIMER.md) 与 [SECURITY.md](SECURITY.md)。
 
