@@ -51,6 +51,35 @@
 - 文档：`REPORT.md`（架构/实测证据/换机预估）、`docs/ARCHITECTURE.md`（协议细节）、
   `docs/RUNBOOK.md`（运维手册）、`deploy/NEW-MACHINE.md`（换机部署清单）
 
+### 修复：装完之后 DSH 里根本没有模型
+
+**现象**：跑完 `一键安装.cmd`，桥起来了、三盏灯全绿，但 DSH 的模型下拉里找不到「脑力·」。
+
+**根因**：`install.ps1` 只负责「把桥架起来」，**完全没有碰 DSH 的配置** ——
+`cordis.patch.yml` 里的 provider 段和 `.credentials.yaml` 里的 `refs` 都得手工加。
+手册却直接跳到「在 DSH 里选模型」，中间的鸿沟没人填。
+
+**修法**：新增 `scripts/wb-configure-dsh.ps1`，并接进安装流程（现在是 6 步）：
+
+- 遍历 `<DSH_HOME>\profiles\*\cordis.patch.yml`
+- 已含 `workbuddy` → 跳过（幂等，可重复运行）
+- 已有 `llm-pi-ai` 条目但没有 `providers:` → 在 `config:` 下新建并插入
+- 已有 `providers:` → 在其下追加（**保留原有 provider**）
+- 完全没有 `llm-pi-ai` → 文件末尾追加完整条目
+- 跳过明显是客户端（web 界面）的 profile，避免污染配置
+- `.credentials.yaml` 缺 `WORKBUDDY_LOCAL_KEY` 则补进 `refs:`
+- 每次改动都先备份为 `*.bak-<时间戳>`
+
+三种 profile 形态都实测过（含 YAML 解析校验）：
+
+| 场景 | 结果 |
+|---|---|
+| 有 llm-pi-ai、无 providers | 插入成功，原有 `someOtherOption` 等配置保留 |
+| 已有 providers（deepseek-account / kimi） | 追加成功，三个 provider 并存 |
+| 没有 llm-pi-ai 条目 | 末尾自动建条目 |
+
+安装脚本结尾和文档都加了醒目提示：**必须完全退出 DSH 再打开**（关窗口不算）。
+
 ### 修复：取 token 时只认 `WorkBuddy.exe`（换机必失败）
 
 **现象**：换到另一台电脑，WorkBuddy 明明开着、也发过消息，启动脚本却报

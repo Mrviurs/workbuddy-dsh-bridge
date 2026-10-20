@@ -59,7 +59,9 @@ It does four things automatically (about 2 minutes, no input needed):
 2. **finds where WorkBuddy is installed on your machine** and writes it into the config
    (this is the step that saves you from editing paths by hand)
 3. builds the GUI (skipped if it already exists)
-4. creates three desktop shortcuts
+4. **registers the WorkBuddy models into your DSH config** - this is what makes
+   the `脑力·` entries appear in the model dropdown
+5. creates three desktop shortcuts, then starts the bridge
 
 When it finishes you will see `=== 安装结束 ===` (setup complete) and the desktop icon appears.
 
@@ -122,8 +124,9 @@ Pick one and chat normally.
 
 | Situation | What to do |
 |---|---|
-| No such names in the dropdown at all | **Fully quit and reopen DSH** (config changes need a restart) |
-| Still missing after restart | This PC's DSH **isn't wired to the bridge yet**: either click "Copy diagnostics" and send it to me, or add the `config/cordis.patch.example.yml` block to your DSH profile yourself (see [README](../README.md)) |
+| No such names at all (first time) | **Fully quit and reopen DSH.** Closing the window is not quitting - exit the whole app, tray icon included |
+| Still missing after restart | The config wasn't written. Run `scripts\wb-configure-dsh.ps1` in PowerShell and read its output, or click "Copy diagnostics" and send it to me |
+| It worked before, gone now | A DSH update may have reset the profile config - re-run `一键安装.cmd` |
 
 ---
 

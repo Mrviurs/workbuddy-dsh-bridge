@@ -27,7 +27,7 @@ Write-Host "=== WorkBuddy 中转工具 · 一键安装 ===" -ForegroundColor Cya
 Write-Host "    项目目录：$root" -ForegroundColor DarkGray
 
 # ---------------------------------------------------------------- 1. 环境检查
-& $step "[1/5] 检查运行环境"
+& $step "[1/6] 检查运行环境"
 
 function Find-Node {
   $c = (Get-Command node -ErrorAction SilentlyContinue).Source
@@ -110,7 +110,7 @@ if ($wbProcCands.Count -gt 0) {
 }
 
 # ---------------------------------------------------------------- 2. 生成配置
-& $step "[2/5] 写入配置"
+& $step "[2/6] 写入配置"
 
 $cfgPath = Join-Path $root 'config\settings.psd1'
 $example = Join-Path $root 'config\settings.example.psd1'
@@ -162,7 +162,7 @@ if ($needWrite) {
 }
 
 # ---------------------------------------------------------------- 3. 图形界面
-& $step "[3/5] 图形界面（可选）"
+& $step "[3/6] 图形界面（可选）"
 
 $exe = Join-Path $root 'ui\dist\WorkBuddyRelayUI\WorkBuddyRelayUI.exe'
 if (Test-Path $exe) {
@@ -191,7 +191,23 @@ if (Test-Path $exe) {
 }
 
 # ---------------------------------------------------------------- 4. 桌面快捷方式
-& $step "[4/5] 创建桌面快捷方式"
+& $step "[4/6] 配置 DSH（让模型下拉里出现「脑力·」）"
+
+$cfgDsh = Join-Path $root 'scripts\wb-configure-dsh.ps1'
+if (Test-Path $cfgDsh) {
+  $dshHomeCheck = if ($env:DSH_HOME) { $env:DSH_HOME } else { Join-Path $env:USERPROFILE '.dsh' }
+  if (Test-Path $dshHomeCheck) {
+    & powershell -NoProfile -ExecutionPolicy Bypass -File $cfgDsh
+  } else {
+    & $warn "这台机器没找到 DSH 配置目录（$dshHomeCheck）"
+    Write-Host "        如果这台机器不用 DSH，这步可以忽略：桥已经能跑，只是没人用它" -ForegroundColor DarkGray
+    Write-Host "        如果装了 DSH：先启动一次 DSH 让 profile 生成，再重跑本脚本" -ForegroundColor DarkGray
+  }
+} else {
+  & $warn "找不到 scripts\wb-configure-dsh.ps1，跳过"
+}
+
+& $step "[5/6] 创建桌面快捷方式"
 
 if ($SkipShortcuts) {
   & $warn "已按参数跳过"
@@ -237,7 +253,7 @@ if ($SkipShortcuts) {
 }
 
 # ---------------------------------------------------------------- 5. 首次启动
-& $step "[5/5] 首次启动"
+& $step "[6/6] 首次启动"
 
 if ($SkipStart) {
   & $warn "已按参数跳过启动"
@@ -253,6 +269,7 @@ if ($SkipStart) {
 Write-Host ""
 Write-Host "=== 安装结束 ===" -ForegroundColor Cyan
 Write-Host "  1. 桌面上应该有「WorkBuddy中转工具」图标，双击即可" -ForegroundColor Gray
-Write-Host "  2. 使用说明：docs\GUIDE.zh-CN.md（中文） / docs\GUIDE.md（English）" -ForegroundColor Gray
-Write-Host "  3. 出问题：打开界面点「复制诊断报告」，把内容发给作者" -ForegroundColor Gray
+Write-Host "  2. ★ DSH 需要【完全退出再打开】一次，模型下拉里才会出现「脑力·」系列" -ForegroundColor Yellow
+Write-Host "  3. 使用说明：docs\GUIDE.zh-CN.md（中文） / docs\GUIDE.md（English）" -ForegroundColor Gray
+Write-Host "  4. 出问题：打开界面点「复制诊断报告」，把内容发给作者" -ForegroundColor Gray
 Write-Host ""

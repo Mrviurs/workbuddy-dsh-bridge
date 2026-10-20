@@ -114,11 +114,14 @@ Set-ExecutionPolicy -Scope Process Bypass -Force
 > 之后日常使用只需双击桌面的「WorkBuddy中转工具」。
 > 只想启动服务、不做安装：`.\scripts\wb-clean-start.ps1`
 
+`install.ps1` 的第 4 步会自动把 provider 写进 DSH 配置（含 `.credentials.yaml` 的 refs）。
+想单独重跑这一步：
+
 ```powershell
-# 2) 在 DSH 的 profile 里加 provider（见 config\cordis.patch.example.yml）
-#    并在 .credentials.yaml 的 refs: 下加 WORKBUDDY_LOCAL_KEY
-#    然后重启 DSH，模型下拉里会出现「脑力·xxx」
+.\scripts\wb-configure-dsh.ps1
 ```
+
+**然后必须完全退出 DSH 再重新打开**，模型下拉里才会出现「脑力·xxx」。
 
 图形界面由 `install.ps1` 自动打包；也可手动执行下面的构建命令，然后双击 `ui\dist\WorkBuddyRelayUI\WorkBuddyRelayUI.exe`。
 
