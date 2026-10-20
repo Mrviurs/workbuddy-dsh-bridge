@@ -6,9 +6,18 @@ on:
   pull_request:
   workflow_dispatch:
 
+# 注意：GitHub Actions 的 pwsh 包装是
+#   $ErrorActionPreference = 'stop'  ;  <你的脚本>  ;  exit $LASTEXITCODE
+# 所以任何原生命令以非零退出（例如 `git ls-files --error-unmatch` 用于"判断不存在"）
+# 都会让整个 step 判失败，即使脚本逻辑完全走通。
+# 因此：每个 step 走成功路径时显式 `exit 0`，且不用"靠非零退出码表达不存在"的写法。
+
 jobs:
   check:
     runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
     steps:
       - uses: actions/checkout@v4
 
@@ -16,35 +25,60 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: 环境自检
+        run: |
+          Write-Host "PowerShell : $($PSVersionTable.PSVersion)"
+          Write-Host "OS         : $($PSVersionTable.OS)"
+          Write-Host "python     : $(python --version 2>&1)"
+          Write-Host "ErrorActionPreference : $ErrorActionPreference"
+          exit 0
+
       - name: Python 语法检查
         run: |
-          python -m py_compile relay/workbuddy-openai-relay.py
-          python -m py_compile ui/wb_bridge_ui.py
+          $fail = 0
+          foreach ($f in @('relay/workbuddy-openai-relay.py', 'ui/wb_bridge_ui.py')) {
+            python -m py_compile $f
+            if ($LASTEXITCODE -ne 0) {
+              Write-Host "::error::$f 语法检查失败"
+              $fail = 1
+            }
+          }
+          if ($fail -ne 0) { exit 1 }
+          Write-Host "Python 语法通过"
+          exit 0
 
       - name: PowerShell 语法检查
-        shell: pwsh
         run: |
           $errors = @()
-          Get-ChildItem scripts -Recurse -Filter *.ps1 | ForEach-Object {
+          $files = @(Get-ChildItem scripts -Recurse -Filter *.ps1)
+          foreach ($f in $files) {
             $e = $null; $t = $null
-            [void][System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$t, [ref]$e)
-            if ($e.Count -gt 0) { $errors += "$($_.Name): $($e[0].Message)" }
+            [void][System.Management.Automation.Language.Parser]::ParseFile($f.FullName, [ref]$t, [ref]$e)
+            if ($e.Count -gt 0) { $errors += "$($f.Name): $($e[0].Message)" }
           }
           if ($errors.Count -gt 0) {
             $errors | ForEach-Object { Write-Host "::error::$_" }
             exit 1
           }
-          Write-Host "所有 .ps1 语法通过"
+          Write-Host "$($files.Count) 个 .ps1 语法通过"
+          exit 0
 
       - name: 配置模板可解析
-        shell: pwsh
         run: |
-          $s = Import-PowerShellDataFile config/settings.example.psd1
-          if (-not $s.ContainsKey('CodebuddyCli')) { throw "settings.example.psd1 缺少 CodebuddyCli" }
+          try {
+            $s = Import-PowerShellDataFile config/settings.example.psd1
+          } catch {
+            Write-Host "::error::settings.example.psd1 无法解析: $($_.Exception.Message)"
+            exit 1
+          }
+          if (-not $s.ContainsKey('CodebuddyCli')) {
+            Write-Host "::error::settings.example.psd1 缺少 CodebuddyCli"
+            exit 1
+          }
           Write-Host "settings.example.psd1 解析通过"
+          exit 0
 
-      - name: 敏感信息扫描（防 token / 私钥误提交）
-        shell: pwsh
+      - name: 敏感信息扫描
         run: |
           # 特征串拆开拼接：否则扫描器会把自己的规则字符串当成命中
           $patterns = @(
@@ -53,32 +87,31 @@ jobs:
             ('BEGIN RSA ' + 'PRIVATE KEY')
           )
           $hits = @()
-          Get-ChildItem -Recurse -File -Include *.md,*.ps1,*.py,*.yml,*.yaml,*.psd1,*.cmd |
-            Where-Object { $_.FullName -notmatch '\\\.git\\|\\\.github\\' } |
-            ForEach-Object {
-              $f = $_
-              foreach ($p in $patterns) {
-                if (Select-String -Path $f.FullName -Pattern $p -SimpleMatch -ErrorAction SilentlyContinue) {
-                  $hits += "$($f.Name): 命中凭据特征"
-                }
-              }
+          $files = @(Get-ChildItem -Recurse -File -Include *.md,*.ps1,*.py,*.yml,*.yaml,*.psd1,*.cmd |
+                     Where-Object { $_.FullName -notmatch '\\\.git\\|\\\.github\\' })
+          foreach ($f in $files) {
+            foreach ($p in $patterns) {
+              $m = Select-String -Path $f.FullName -Pattern $p -SimpleMatch -ErrorAction SilentlyContinue
+              if ($m) { $hits += "$($f.Name): 命中凭据特征" }
             }
+          }
           if ($hits.Count -gt 0) {
-            $hits | ForEach-Object { Write-Host "::error::$_" }
+            $hits | Sort-Object -Unique | ForEach-Object { Write-Host "::error::$_" }
             exit 1
           }
-          Write-Host "未发现凭据特征"
+          Write-Host "扫描 $($files.Count) 个文件，未发现凭据特征"
+          exit 0
 
       - name: 确认本机配置未被追踪
-        shell: pwsh
         run: |
-          $bad = 0
-          foreach ($p in @('config/settings.psd1', 'config/cordis.patch.current.yml')) {
-            git ls-files --error-unmatch $p 2>$null | Out-Null
-            if ($LASTEXITCODE -eq 0) {
-              Write-Host "::error::$p 被纳入版本控制，请检查 .gitignore"
-              $bad++
-            }
+          # 用全量列表比对，不用 `git ls-files --error-unmatch`（那是靠非零退出码表达"不存在"，
+          # 会被 GH Actions 的 exit $LASTEXITCODE 判成失败）
+          $tracked = @(git ls-files)
+          $shouldNotBeTracked = @('config/settings.psd1', 'config/cordis.patch.current.yml')
+          $bad = @($shouldNotBeTracked | Where-Object { $tracked -contains $_ })
+          if ($bad.Count -gt 0) {
+            $bad | ForEach-Object { Write-Host "::error::$_ 被纳入版本控制，请检查 .gitignore" }
+            exit 1
           }
-          if ($bad -gt 0) { exit 1 }
-          Write-Host "本机配置均未被追踪"
+          Write-Host "追踪 $($tracked.Count) 个文件，本机配置均未被追踪"
+          exit 0
