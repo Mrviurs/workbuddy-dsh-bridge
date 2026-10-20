@@ -76,3 +76,34 @@ node "D:\WorkBuddy\resources\app.asar.unpacked\cli\bin\codebuddy" --help
 
 参数变了就改 `scripts/wb-clean-start.ps1` 里生成 `$serveLines` 的那段。
 接口路径变了就改 `relay/workbuddy-openai-relay.py` 里的 `run_agent` / `_acp_method`。
+
+## 中文用户名导致 git 走 SSH 失败（Git for Windows 的坑）
+
+**现象**（`git push` / `git clone` 时）：
+
+```
+Could not create directory '/c/Users/\260\262\311\275/.ssh' (No such file or directory).
+Failed to add the host to the list of known hosts (/c/Users/\260\262\311\275/.ssh/known_hosts).
+git@github.com: Permission denied (publickey).
+```
+
+**原因**：Git for Windows 自带的 MSYS 版 `ssh.exe`（`C:\Program Files\Git\usr\bin\ssh.exe`）
+无法正确处理非 ASCII 用户名，把 `C:\Users\安山` 按 GBK 字节转成
+`/c/Users/\260\262\311\275`（`\260\262`＝"安"，`\311\275`＝"山"），这个路径不存在，于是：
+
+- 写不进 `known_hosts` → 每次连接都问 "continue connecting?"
+- 找不到 `~/.ssh/id_ed25519` → `Permission denied (publickey)`
+
+**修复**：让 git 改用 Windows 自带的 OpenSSH（对中文路径正常）：
+
+```powershell
+git config --global core.sshCommand "C:/Windows/System32/OpenSSH/ssh.exe"
+ssh -T git@github.com        # 应输出 Hi <你的用户名>! You've successfully authenticated
+```
+
+验证：`git ls-remote origin` 退出码 0 即通。
+
+撤销：`git config --global --unset core.sshCommand`
+
+> 这条坑与项目本身无关，但凡是中文用户名 + Git for Windows 都会遇到，
+> 而且报错信息（乱码路径）很容易被误判成 key 没配好。

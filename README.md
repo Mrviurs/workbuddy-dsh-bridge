@@ -156,6 +156,7 @@ python -m PyInstaller --noconfirm --onedir --noconsole --name WorkBuddyRelayUI `
 | DSH 报 `MISSING_CREDENTIAL` | 缺 `WORKBUDDY_LOCAL_KEY`，见 `config/credentials.example.yaml` |
 | 模型只聊天不调工具 | 看日志 `[chat] ... calls=0`；确认 `--tools ""` 生效且 DSH 请求带 tools |
 | 模型答得奇怪 / 拒绝配合 | 上游会话历史形成了立场 → WorkBuddy 新建对话后重跑启动脚本 |
+| `git push` 报 `Permission denied (publickey)` + 乱码路径 | 中文用户名撞上 Git 自带 MSYS ssh，改用 Windows OpenSSH：`git config --global core.sshCommand "C:/Windows/System32/OpenSSH/ssh.exe"`（详见 docs/RUNBOOK.md） |
 
 更完整的流程图与协议细节见 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)，
 日常运维与参数调整见 [docs/RUNBOOK.md](docs/RUNBOOK.md)。
