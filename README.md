@@ -1,5 +1,10 @@
 # workbuddy-dsh-bridge
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-0078D4)](#)
+[![PowerShell](https://img.shields.io/badge/PowerShell-5.1%2B-5391FE)](#)
+[![Python](https://img.shields.io/badge/Python-3.8%2B-3776AB)](#)
+
 把 **WorkBuddy**（CodeBuddy 桌面端）账号里的模型，接成 **DeepSeek Harness** 的一个 OpenAI 兼容 provider。
 
 做到三件原本做不到的事：
@@ -38,6 +43,12 @@
 ---
 
 ## 快速开始
+
+```bash
+git clone git@github.com:Mrviurs/workbuddy-dsh-bridge.git
+cd workbuddy-dsh-bridge
+```
+
 
 ### 前置条件
 
@@ -147,3 +158,7 @@ python -m PyInstaller --noconfirm --onedir --noconsole --name WorkBuddyRelayUI `
 ## License
 
 [MIT](LICENSE) —— 使用前请先读 [SECURITY.md](SECURITY.md) 与上面的免责声明。
+
+---
+
+仓库：<https://github.com/Mrviurs/workbuddy-dsh-bridge>
