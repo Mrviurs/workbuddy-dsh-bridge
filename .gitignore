@@ -1,0 +1,19 @@
+﻿# 依赖与构建产物
+ui/dist/
+ui/build*/
+*.spec
+__pycache__/
+*.pyc
+
+# 本机配置（含绝对路径，不进仓库）
+config/settings.psd1
+config/cordis.patch.current.yml
+
+# 运行时产物
+*.log
+wb-diagnose-*.txt
+
+# 编辑器
+.vscode/
+.idea/
+*.swp

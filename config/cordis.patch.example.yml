@@ -1,0 +1,58 @@
+# 把下面这段追加到 <DSH_HOME>/profiles/desktop/cordis.patch.yml 末尾
+# （该文件顶层是数组，直接追加条目即可；已有的条目不要覆盖）
+#
+# 再在 <DSH_HOME>/.credentials.yaml 的 refs: 段下加一行：
+#   WORKBUDDY_LOCAL_KEY: local-relay-placeholder
+
+- id: llm-pi-ai
+  name: "@deepseek-ai/dsh-llm-pi-ai"
+  config:
+    providers:
+      workbuddy:
+        displayName: WorkBuddy 脑力通道
+        apiKeyEnv: WORKBUDDY_LOCAL_KEY     # 本桥不校验，任意非空占位值
+        api: openai-completions
+        baseURL: http://127.0.0.1:8787/v1  # 端口要与 config/settings.psd1 的 RelayPort 一致
+        models:
+          - id: wb-deepseek-v4-pro
+            name: 脑力·DeepSeek-V4-Pro (WB)
+            contextWindow: 1000000
+            maxTokens: 128000
+            input: [text, image]
+            reasoningEfforts:
+              off:
+              high: high
+              xhigh: xhigh
+          - id: wb-deepseek-flash
+            name: 脑力·DeepSeek-V4.1-Flash (WB)
+            contextWindow: 1000000
+            maxTokens: 65536
+            input: [text, image]
+            reasoningEfforts:
+              off:
+              low: low
+              high: high
+              max: max
+          - id: wb-glm-5.3
+            name: 脑力·GLM-5.3 (WB)
+            contextWindow: 1000000
+            maxTokens: 65536
+            input: [text, image]
+          - id: wb-kimi-k3
+            name: 脑力·Kimi-K3 (WB)
+            contextWindow: 1000000
+            maxTokens: 65536
+            input: [text, image]
+          - id: wb-minimax-m3
+            name: 脑力·MiniMax-M3 (WB)
+            contextWindow: 512000
+            maxTokens: 65536
+            input: [text]
+
+# 可选：把默认模型设为脑力通道（不设则默认仍是原生 deepseek-account）
+#- id: agent-default-model
+#  name: "@deepseek-ai/dsh-agent-default-model"
+#  config:
+#    provider: workbuddy
+#    model: wb-deepseek-v4-pro
+#    reasoningEffort: high
