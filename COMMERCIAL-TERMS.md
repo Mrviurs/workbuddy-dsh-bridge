@@ -173,6 +173,10 @@
 
 ## 附：收到商用询问时的回复模板（直接改一下就能发）
 
+> 如果对方是通过 GitHub issue 来的，让他们直接提交 **「商用授权申请」表单** 即可，
+> 表单已经问好了下面这三项，免去来回：
+> <https://github.com/Mrviurs/workbuddy-dsh-bridge/issues/new/choose>
+
 > 感谢关注 workbuddy-dsh-bridge。
 >
 > 这个项目个人使用免费；商业使用需要一份简单的书面授权。条款模板在这里：

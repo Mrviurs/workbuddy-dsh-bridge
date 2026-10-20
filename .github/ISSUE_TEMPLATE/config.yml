@@ -1,5 +1,8 @@
 ﻿blank_issues_enabled: false
 contact_links:
+  - name: 商用授权（需事先取得书面授权）
+    url: https://github.com/Mrviurs/workbuddy-dsh-bridge/blob/main/COMMERCIAL-TERMS.md
+    about: 先看条款模板；要正式申请请选上面的「商用授权申请」表单，填完我会把条款填好发你确认
   - name: 先看文档
     url: https://github.com/Mrviurs/workbuddy-dsh-bridge#排障
     about: README 的排障表 + deploy/NEW-MACHINE.md 覆盖了大部分"跑不起来"

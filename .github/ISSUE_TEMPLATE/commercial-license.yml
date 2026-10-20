@@ -1,0 +1,111 @@
+name: 商用授权申请 / Commercial License Request
+description: 申请将 workbuddy-dsh-bridge 用于商业用途（需事先取得书面授权）
+title: "[Commercial License] "
+labels: ["commercial-license"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 申请前先看三行
+
+        - **个人 / 非商业使用免费，不需要提交这个申请**——直接用即可。
+        - **商业使用需要事先取得书面授权**。在你收到明确答复之前，商业使用**尚未被授权**
+          （沉默、没回复、"大概可以吧"，都不算同意）。
+        - 有些用途**付费也不授权**，提交了也不会通过：
+          转售 / 代充他人账号服务、做成对外中转 API、批量注册 / 代他人提取凭据、绕过官方付费。
+
+        📄 授权条款模板（可以先看条款再决定要不要申请）：
+        [COMMERCIAL-TERMS.md](https://github.com/Mrviurs/workbuddy-dsh-bridge/blob/main/COMMERCIAL-TERMS.md)
+
+        填完这个表单，我会按模板把条款填好发回给你确认。
+
+  - type: input
+    id: org-name
+    attributes:
+      label: 公司 / 组织全称
+      description: 需要签署授权的主体全称（不是品牌名或产品名）
+      placeholder: 例如：某某科技有限公司
+    validations:
+      required: true
+
+  - type: input
+    id: org-region
+    attributes:
+      label: 注册地
+      description: 国家 / 地区（如需填统一社会信用代码或公司注册号，可写在这里）
+      placeholder: 例如：中国 · 上海市
+    validations:
+      required: true
+
+  - type: input
+    id: contact
+    attributes:
+      label: 联系邮箱
+      description: 用于发送条款与后续沟通
+      placeholder: name@company.com
+    validations:
+      required: true
+
+  - type: dropdown
+    id: use-type
+    attributes:
+      label: 打算怎么用
+      description: 选择最接近的一项；混合用途请选"其他"并在下面说明
+      options:
+        - 内部工具（员工自用，不向第三方提供）
+        - 集成进商业产品（对外销售或分发）
+        - 随项目交付给客户（服务交付的一部分）
+        - 其他（请在下方说明）
+    validations:
+      required: true
+
+  - type: textarea
+    id: usage-detail
+    attributes:
+      label: 用途与规模说明
+      description: 越具体越好填条款。建议覆盖这几点。
+      value: |
+        1. 具体用途：
+        2. 使用人数 / 部署台数：
+        3. 涉及的产品或项目名称：
+        4. 预计开始使用时间：
+        5. 使用地域：
+      render: text
+    validations:
+      required: true
+
+  - type: dropdown
+    id: modify-source
+    attributes:
+      label: 是否需要修改源码
+      options:
+        - 不需要，直接用
+        - 需要少量修改（配置、少量适配）
+        - 需要较大改动或二次开发
+    validations:
+      required: true
+
+  - type: dropdown
+    id: budget
+    attributes:
+      label: 费用方面的期望
+      description: 没有标准答案，说实际想法就行；选"希望免费"也会认真考虑
+      options:
+        - 希望免费（可在产品致谢页署名）
+        - 可以付费，希望了解报价
+        - 待讨论
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: 确认事项
+      description: 三项都必须勾选，否则申请无法处理
+      options:
+        - label: 我已阅读 LICENSE 第 4 条（六项永不允许的用途），确认我的用途不在其中
+          required: true
+        - label: 我理解在收到明确的书面同意之前，商业使用尚未被授权
+          required: true
+        - label: 我提供的信息真实，且我有权代表该组织提交此申请
+          required: true

@@ -6,6 +6,9 @@ body:
   - type: markdown
     attributes:
       value: |
+        > **要商用？** 这不是反馈模板。请选「商用授权申请 / Commercial License Request」，
+        > 或先看 [COMMERCIAL-TERMS.md](https://github.com/Mrviurs/workbuddy-dsh-bridge/blob/main/COMMERCIAL-TERMS.md)。
+
         ## 先做两件事
         1. 跑一次无界面诊断，把输出贴上来：
            ```

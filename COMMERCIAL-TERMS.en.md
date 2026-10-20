@@ -191,6 +191,10 @@ clients** are handled per the "after expiry" rule in §3.
 
 ## Appendix: reply template for commercial enquiries
 
+> If the enquiry arrives on GitHub, just point them at the **Commercial License Request**
+> issue form - it already asks for these three things:
+> <https://github.com/Mrviurs/workbuddy-dsh-bridge/issues/new/choose>
+
 > Thanks for your interest in workbuddy-dsh-bridge.
 >
 > The project is free for personal use; commercial use needs a short written license. Template here:
