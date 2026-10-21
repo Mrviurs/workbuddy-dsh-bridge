@@ -94,7 +94,7 @@ $cfg = [ordered]@{ base = $base; password = $gw; port = $Port; systemMode = $Sys
 Ok "配置已写入 $cfgFile（systemMode=$SystemMode）"
 
 $tr = "`"$pythonW`" `"$relayPy`" --log `"$logFile`""
-& schtasks /create /tn $taskName /tr $tr /sc once /st 23:59 /f 2>&1 | Out-Null
+& schtasks /create /tn $taskName /tr $tr /sc onlogon /f 2>&1 | Out-Null
 if ($LASTEXITCODE -ne 0) {
   Bad "注册计划任务失败（schtasks 返回 $LASTEXITCODE）"
   Write-Host "  可以退回到前台模式手工跑：" -ForegroundColor Yellow

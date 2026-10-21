@@ -1,5 +1,6 @@
 ﻿param(
   [switch]$SkipSelfTest,
+  [switch]$Quiet,
   [switch]$RescanToken,
   [int]$ServePort = 0,
   [int]$RelayPort = 0
@@ -53,6 +54,10 @@ function Get-JwtExp($jwt) {
 Write-Host ""
 if (-not $ServePort) { $ServePort = if ($S.ServePort) { $S.ServePort } else { 8791 } }
 if (-not $RelayPort) { $RelayPort = if ($S.RelayPort) { $S.RelayPort } else { 8787 } }
+if ($Quiet) {
+  try { Start-Transcript -Path 'C:\temp\wb-autostart.log' -Append -Force | Out-Null } catch { }
+  $SkipSelfTest = $true
+}
 Write-Host "=== WorkBuddy 硬解模式启动器（自建 serve + DSH 提示词作为 system） ===" -ForegroundColor Cyan
 Write-Host ""
 
@@ -198,8 +203,21 @@ $serveLines = @(
 Ok "serve 启动脚本已写入 $servePs1"
 
 $tr = "powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$servePs1`""
-& schtasks /create /tn $serveTask /tr $tr /sc once /st 23:58 /f 2>&1 | Out-Null
-& schtasks /run /tn $serveTask 2>&1 | Out-Null
+& schtasks /delete /tn $serveTask /f 2>&1 | Out-Null
+$cr = & schtasks /create /tn $serveTask /tr $tr /sc onlogon /f 2>&1
+if ($LASTEXITCODE -eq 0) {
+  & schtasks /run /tn $serveTask 2>&1 | Out-Null
+  Ok "serve 计划任务已就绪（登录时自动运行）"
+} else {
+  # 普通权限下创建计划任务可能被拒（Access is denied），改用 WMI 直接起进程：
+  # 父进程是 WmiPrvSE，不受 DSH 作业对象影响，也不需要管理员。
+  Warn "创建计划任务被拒（$((($cr -join ' ') -replace '\s+',' ').Trim())），改用 WMI 直接启动"
+  $w = Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{
+    CommandLine = "powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$servePs1`""
+  }
+  if ($w.ReturnValue -eq 0) { Ok "serve 已用 WMI 启动（pid $($w.ProcessId)）" }
+  else { Bad "WMI 启动 serve 失败：ReturnValue=$($w.ReturnValue)" }
+}
 
 $up = $false
 for ($i = 0; $i -lt 35; $i++) {
@@ -242,8 +260,16 @@ if ($rtr.Length -gt 258) {
   Write-Host "        Windows 的 schtasks /tr 上限 261 字符。请把项目移到更短的路径（例如 C:\wb-bridge），或把 Python 装到短路径。" -ForegroundColor Yellow
   exit 1
 }
-& schtasks /create /tn $relayTask /tr $rtr /sc once /st 23:59 /f 2>&1 | Out-Null
-& schtasks /run /tn $relayTask 2>&1 | Out-Null
+& schtasks /delete /tn $relayTask /f 2>&1 | Out-Null
+$cr2 = & schtasks /create /tn $relayTask /tr $rtr /sc onlogon /f 2>&1
+if ($LASTEXITCODE -eq 0) {
+  Ok "relay 计划任务已就绪（登录时自动运行）"
+} else {
+  Warn "创建 relay 计划任务被拒（$((($cr2 -join ' ') -replace '\s+',' ').Trim())），改用 WMI 直接启动"
+  $w2 = Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{ CommandLine = $rtr }
+  if ($w2.ReturnValue -eq 0) { Ok "relay 已用 WMI 启动（pid $($w2.ProcessId)）" }
+  else { Bad "WMI 启动 relay 失败：ReturnValue=$($w2.ReturnValue)" }
+}
 
 $health = $null
 for ($i = 0; $i -lt 25; $i++) { Start-Sleep -Milliseconds 800; try { $health = Invoke-RestMethod "http://127.0.0.1:$RelayPort/health" -TimeoutSec 3; break } catch {} }
@@ -272,7 +298,43 @@ if (-not $SkipSelfTest) {
 
 Write-Host ""
 Write-Host "硬解模式已就绪 —— DSH 的提示词现在作为 system 生效，上游没有工具权限。" -ForegroundColor Green
-Write-Host "  serve : http://127.0.0.1:$ServePort （计划任务 $serveTask）" -ForegroundColor DarkGray
-Write-Host "  relay : http://127.0.0.1:$RelayPort （计划任务 $relayTask）" -ForegroundColor DarkGray
+Write-Host "  serve : http://127.0.0.1:$ServePort" -ForegroundColor DarkGray
+Write-Host "  relay : http://127.0.0.1:$RelayPort" -ForegroundColor DarkGray
+Write-Host "  自启  : 启动文件夹（登录 Windows 后自动运行；计划任务不可用时靠它）" -ForegroundColor DarkGray
 Write-Host "  token : $jwtPath（有效期至 $(Get-JwtExp (Get-Content $jwtPath -Raw).Trim())）" -ForegroundColor DarkGray
+# ---------- 开机自启（启动文件夹 + 快捷方式）----------
+# 为什么用 .lnk 而不是 .cmd：
+#   cmd 文件里写含中文的绝对路径时，传给 powershell -File 会被代码页破坏
+#   （实测 C:\Users\安山 变成 ??，导致 -File 找不到文件）。
+#   .lnk 内部是 UTF-16，不受代码页影响。
+$startupDir = [Environment]::GetFolderPath('Startup')
+if ($startupDir -and (Test-Path $startupDir)) {
+  $lnkPath = Join-Path $startupDir 'WorkBuddyBridge.lnk'
+  $wantArgs = "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$root\scripts\wb-clean-start.ps1`" -Quiet"
+  $needWrite = $true
+  if (Test-Path $lnkPath) {
+    try {
+      $cur = (New-Object -ComObject WScript.Shell).CreateShortcut($lnkPath)
+      if ($cur.Arguments -eq $wantArgs) { $needWrite = $false }
+    } catch { }
+  }
+  if ($needWrite) {
+    try {
+      $ws = New-Object -ComObject WScript.Shell
+      $lnk = $ws.CreateShortcut($lnkPath)
+      $lnk.TargetPath = "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe"
+      $lnk.Arguments = $wantArgs
+      $lnk.WorkingDirectory = $root
+      $lnk.WindowStyle = 7
+      $lnk.Description = 'WorkBuddy 中转自动启动'
+      $lnk.Save()
+      Write-Host "  开机自启：已创建 $lnkPath" -ForegroundColor DarkGray
+    } catch {
+      Write-Host "  开机自启：创建快捷方式失败（$($_.Exception.Message)）" -ForegroundColor Yellow
+    }
+  } else {
+    Write-Host "  开机自启：已就绪" -ForegroundColor DarkGray
+  }
+}
+
 Write-Host ""

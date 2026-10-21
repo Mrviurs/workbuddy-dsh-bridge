@@ -61,6 +61,27 @@ powershell -ExecutionPolicy Bypass -File .\scripts\wb-doctor.ps1
 
 报告不含 token 本身，可以直接发给作者。
 
+## DSH 报 502（由于目标计算机积极拒绝，无法连接）
+
+**含义**：DSH 连 `127.0.0.1:8787` 被拒 —— relay 没在跑。不是网络问题，也不是配置问题。
+
+**处理**：双击桌面「WorkBuddy中转工具」→ 点「启动 / 修复」。
+
+**为什么会没跑**（这条链踩过三个坑，都修了）：
+
+| 坑 | 现象 | 现在怎么做 |
+|---|---|---|
+| 计划任务用 `/sc once`（一次性时间触发） | 建好当时能用，重启后永不再起 | 改为 `/sc onlogon`（登录即起） |
+| 普通权限下 `schtasks /create` 被拒（Access denied） | 任务建不出来，服务根本起不来 | 失败自动回落 **WMI 直接启动**（父进程 WmiPrvSE，同样不受 DSH 退出影响，且不需要管理员） |
+| 启动文件夹里放 `.cmd`，内容含中文路径 | `C:\Users\安山` 被代码页写成 `C:\Users\??` 或传参失败 | 改放 **`.lnk` 快捷方式**（内部 UTF-16，不受代码页影响） |
+
+**自启现状**：
+
+- 计划任务 `WorkBuddyCleanServe` / `WorkBuddyRelay`（`onlogon`，有权限时）—— 优先
+- 启动文件夹 `WorkBuddyBridge.lnk` —— 兜底，登录后静默跑一次
+- 静默模式日志：`C:\temp\wb-autostart.log`
+- 强制重启：双击桌面图标 → 启动 / 修复
+
 ## 关键路径速查
 
 | 用途 | 路径 |

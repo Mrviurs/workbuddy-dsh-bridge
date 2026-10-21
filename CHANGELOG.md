@@ -51,6 +51,35 @@
 - 文档：`REPORT.md`（架构/实测证据/换机预估）、`docs/ARCHITECTURE.md`（协议细节）、
   `docs/RUNBOOK.md`（运维手册）、`deploy/NEW-MACHINE.md`（换机部署清单）
 
+### 修复：DSH 报 502 / 服务重启后不自愈（三层问题叠加）
+
+**现象**：DSH 报 `502 <urlopen error [WinError 10061] 由于目标计算机积极拒绝>`。
+
+**链路**（每一层都真的踩到了）：
+
+1. **触发器错**：两个计划任务用的是 `/sc once /st 23:58`（一次性时间触发）——
+   创建后手动 `/run` 能用，但**重启电脑后永不再起**。
+2. **改 `onlogon` 后被拒**：普通权限下 `schtasks /create` 返回 `Access is denied`，
+   任务建不出来，服务直接起不来。
+3. **自启路径被编码破坏**：改用启动文件夹兜底，`.cmd` 里含中文绝对路径
+   `C:\Users\安山\...` —— 按 GBK 写文件后 cmd 能读，但传给 `powershell -File`
+   仍失败（`-File 参数不存在`）；用 ASCII 写则变成 `C:\Users\??`。
+
+**修法**：
+
+- 进程启动：`schtasks` 失败自动回落 **WMI**（`Invoke-CimMethod Win32_Process Create`），
+  父进程是 WmiPrvSE，不受 DSH 作业对象影响，且不需要管理员权限
+- 任务触发器改 `onlogon`；`schtasks /create /f` 对运行中的任务**不会替换触发器**，
+  所以先 `/delete` 再 `/create`（这个也踩了）
+- 开机自启改用**启动文件夹里的 `.lnk`**（`.lnk` 内部 UTF-16，绕开 cmd 代码页问题），
+  指向 `powershell -File <绝对路径> -Quiet`；静默运行并转录到 `%TEMP%\wb-autostart.log`
+- `desktop/*.cmd` 也改成 `cd /d "%~dp0.."` + `powershell -File ".\scripts\xxx.ps1"`
+  （**相对路径传参**，不把中文路径交给命令行）
+- 新增 `-Quiet` 参数：跳过自测、输出转录到日志
+
+实测：模拟登录执行启动文件夹的快捷方式，`[OK] serve 已用 WMI 启动` →
+`[OK] relay 就绪` → 端口 8791/8787 监听 → 真实请求返回正常。
+
 ### 修复：装完之后 DSH 里根本没有模型
 
 **现象**：跑完 `一键安装.cmd`，桥起来了、三盏灯全绿，但 DSH 的模型下拉里找不到「脑力·」。
