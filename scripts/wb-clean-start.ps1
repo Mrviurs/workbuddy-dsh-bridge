@@ -1,6 +1,7 @@
 ﻿param(
   [switch]$SkipSelfTest,
   [switch]$Quiet,
+  [switch]$Force,
   [switch]$RescanToken,
   [int]$ServePort = 0,
   [int]$RelayPort = 0
@@ -151,14 +152,58 @@ New-Item -ItemType Directory -Force C:\temp | Out-Null
 [System.IO.File]::WriteAllText($sysPath, ($sysLines -join "`r`n"), (New-Object System.Text.UTF8Encoding($false)))
 Ok "system prompt 文件已写入 $sysPath"
 
-# ---------- 3. 停旧实例 ----------
-& schtasks /end /tn $serveTask 2>&1 | Out-Null
-& schtasks /end /tn $relayTask 2>&1 | Out-Null
-foreach ($port in @($ServePort, $RelayPort)) {
-  $l = Get-NetTCPConnection -State Listen -LocalPort $port -ErrorAction SilentlyContinue | Select-Object -First 1
-  if ($l) { Stop-Process -Id $l.OwningProcess -Force -ErrorAction SilentlyContinue; Start-Sleep -Milliseconds 700; Ok "已停止旧实例 (端口 $port, pid $($l.OwningProcess))" }
+# ---------- 3. 探测 + 停旧实例 ----------
+# 先探测：已经就绪的不要杀。每次点"启动 / 修复"都重启，会造成文件锁与端口竞争
+# ——日志里的 "对路径 C:\temp\wb-relay-config.json 的访问被拒绝" 正是这么来的。
+$serveAlready = $false
+if (-not $Force) {
+  $lk = Get-NetTCPConnection -State Listen -LocalPort $ServePort -ErrorAction SilentlyContinue
+  if ($lk) {
+    try {
+      $st0 = Invoke-RestMethod "http://127.0.0.1:$ServePort/api/v1/auth/status" -Headers @{ 'x-codebuddy-request' = '1' } -TimeoutSec 6
+      if ($st0.authenticated) {
+        $serveAlready = $true
+        Ok "serve 已在运行且已登录（port $ServePort），跳过重启"
+      }
+    } catch { }
+  }
 }
 
+$relayAlready = $false
+if (-not $Force) {
+  try {
+    $h0 = Invoke-RestMethod "http://127.0.0.1:$RelayPort/health" -TimeoutSec 6
+    if ($h0.ok -and $h0.base -eq "http://127.0.0.1:$ServePort") {
+      $relayAlready = $true
+      Ok "relay 已在运行且指向 $($h0.base)，跳过重启"
+    }
+  } catch { }
+}
+
+if ($serveAlready -and $relayAlready) {
+  Ok "serve 与 relay 都已在运行，本次不做任何重启（要强制重启请加 -Force）"
+} else {
+  & schtasks /end /tn $serveTask 2>&1 | Out-Null
+  & schtasks /end /tn $relayTask 2>&1 | Out-Null
+  foreach ($port in @($ServePort, $RelayPort)) {
+    $already = if ($port -eq $ServePort) { $serveAlready } else { $relayAlready }
+    if ($already) { continue }
+    $l = Get-NetTCPConnection -State Listen -LocalPort $port -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($l) {
+      $opid = $l.OwningProcess
+      Stop-Process -Id $opid -Force -ErrorAction SilentlyContinue
+      Start-Sleep -Milliseconds 700
+      Ok "已停止旧实例 (端口 $port, pid $opid)"
+    }
+  }
+}
+
+# 先探测：已就绪就不折腾。
+# 每次点击"启动 / 修复"都杀进程重启，会造成文件锁与端口竞争
+# ——日志里那种 "对路径 wb-relay-config.json 的访问被拒绝" 就是这么来的。
+if ($serveAlready) {
+  # 什么都不做，直接用现有的
+} else {
 # ---------- 4. 起自建 serve（计划任务；用 PS 脚本避免 cmd 的 1023 字符环境变量截断）----------
 $cli = if ($S.CodebuddyCli) { $S.CodebuddyCli } else { 'D:\WorkBuddy\resources\app.asar.unpacked\cli\bin\codebuddy' }
 if ($cli -match '[<>]') {
@@ -212,8 +257,11 @@ if ($LASTEXITCODE -eq 0) {
   # 普通权限下创建计划任务可能被拒（Access is denied），改用 WMI 直接起进程：
   # 父进程是 WmiPrvSE，不受 DSH 作业对象影响，也不需要管理员。
   Warn "创建计划任务被拒（$((($cr -join ' ') -replace '\s+',' ').Trim())），改用 WMI 直接启动"
-  $w = Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{
-    CommandLine = "powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$servePs1`""
+  $w = $null
+  for ($try = 1; $try -le 2; $try++) {
+    try { $w = Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{
+      CommandLine = "powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$servePs1`"" }; break }
+    catch { if ($try -lt 2) { Start-Sleep -Milliseconds 600 } }
   }
   if ($w.ReturnValue -eq 0) { Ok "serve 已用 WMI 启动（pid $($w.ProcessId)）" }
   else { Bad "WMI 启动 serve 失败：ReturnValue=$($w.ReturnValue)" }
@@ -232,10 +280,25 @@ try {
   if (-not $st.authenticated) { Bad "token 无效（可能已过期），用 -RescanToken 重扫"; exit 1 }
 } catch { Bad "serve 探活失败：$($_.Exception.Message)"; exit 1 }
 
+}
+
+if ($relayAlready) {
+  # 什么都不做
+} else {
 # ---------- 5. relay ----------
 $cfg = [ordered]@{ base = "http://127.0.0.1:$ServePort"; password = 'x'; port = $RelayPort; systemMode = 'full' } | ConvertTo-Json -Compress
-[System.IO.File]::WriteAllText($relayCfg, $cfg, (New-Object System.Text.UTF8Encoding($false)))
-Ok "relay 配置：$cfg"
+$cfgWritten = $false
+for ($try = 1; $try -le 3; $try++) {
+  try {
+    [System.IO.File]::WriteAllText($relayCfg, $cfg, (New-Object System.Text.UTF8Encoding($false)))
+    $cfgWritten = $true
+    break
+  } catch {
+    if ($try -lt 3) { Start-Sleep -Milliseconds 500 }
+    else { Warn "relay 配置写入失败（$($_.Exception.Message)）—— 将沿用已有文件" }
+  }
+}
+if ($cfgWritten) { Ok "relay 配置：$cfg" }
 
 $pythonW = $S.PythonExe
 if (-not $pythonW) {
@@ -266,7 +329,11 @@ if ($LASTEXITCODE -eq 0) {
   Ok "relay 计划任务已就绪（登录时自动运行）"
 } else {
   Warn "创建 relay 计划任务被拒（$((($cr2 -join ' ') -replace '\s+',' ').Trim())），改用 WMI 直接启动"
-  $w2 = Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{ CommandLine = $rtr }
+  $w2 = $null
+  for ($try = 1; $try -le 2; $try++) {
+    try { $w2 = Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{ CommandLine = $rtr }; break }
+    catch { if ($try -lt 2) { Start-Sleep -Milliseconds 600 } }
+  }
   if ($w2.ReturnValue -eq 0) { Ok "relay 已用 WMI 启动（pid $($w2.ProcessId)）" }
   else { Bad "WMI 启动 relay 失败：ReturnValue=$($w2.ReturnValue)" }
 }
@@ -275,6 +342,8 @@ $health = $null
 for ($i = 0; $i -lt 25; $i++) { Start-Sleep -Milliseconds 800; try { $health = Invoke-RestMethod "http://127.0.0.1:$RelayPort/health" -TimeoutSec 3; break } catch {} }
 if (-not $health) { Bad "relay 未起来（日志 $relayLog）"; if (Test-Path $relayLog) { Get-Content $relayLog -Tail 12 }; exit 1 }
 Ok "relay 就绪：http://127.0.0.1:$RelayPort/v1 -> $($health.base)  systemMode=$($health.systemMode)"
+
+}
 
 # ---------- 6. 自测 ----------
 if (-not $SkipSelfTest) {
